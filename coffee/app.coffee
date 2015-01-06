@@ -24,25 +24,6 @@ window.addEventListener "dragover", preventDefault, false
 window.addEventListener "drop", preventDefault, false
 window.addEventListener "dragstart", preventDefault, false
 
-# Spinner options (should go in config file).
-# Should replace spinner by rotating svg later
-spinner_opts =
-    lines: 10 # The number of lines to draw
-    length: 8 # The length of each line
-    width: 3 # The line thickness
-    radius: 8 # The radius of the inner circle
-    color: '#aaa' # #rgb or #rrggbb or array of colors
-    speed: 2 # Rounds per second
-
-spinner_cover_opts =
-    lines: 8 # The number of lines to draw
-    length: 5 # The length of each line
-    width: 2 # The line thickness
-    radius: 6 # The radius of the inner circle
-    color: '#fff' # #rgb or #rrggbb or array of colors
-    speed: 2 # Rounds per second
-
-
 ########################################################
 
 $ ->

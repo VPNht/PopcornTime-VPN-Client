@@ -1,5 +1,4 @@
 # mac install openvpn
-
 VPN::installOpenVPN = ->
     switch process.platform
 
@@ -25,6 +24,7 @@ VPN::installOpenVPN = ->
         		# we install openvpn
         		copyToLocation getInstallPathOpenVPN(), temp
 
+# helper to get vpn install path
 getInstallPathOpenVPN = ->
 	switch process.platform
 		when "darwin", "linux"
