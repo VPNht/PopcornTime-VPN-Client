@@ -3,6 +3,7 @@ class Details
 
     @open = () ->
         $('.login').hide()
+        $('.status').hide()
         $('.details').show()
         $('.usernameLabel').html(window.vpn.user.username)
 

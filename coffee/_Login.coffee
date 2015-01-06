@@ -23,6 +23,7 @@ logout = ->
     window.App.advsettings.set('vpnPassword', '')
     $('.login').show()
     $('.details').hide()
+    $('.status').hide()
 
 login = ->
     username = $('#username').val()
@@ -49,3 +50,4 @@ login = ->
 
                         # we show our details page
                         Details.open()
+                        checkStatus()
