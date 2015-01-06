@@ -28,3 +28,14 @@ VPN::connectPPTP = ->
                     console.log err
                 else
                     console.log stdout
+
+VPN::disconnectPPTP = ->
+
+    switch process.platform
+        when "win32"
+            rasdial = path.join(process.env.SystemDrive, 'Windows', 'System32', 'rasdial.exe')
+            child = exec rasdial + " /disconnect", (error, stdout, stderr) ->
+                if error
+                    console.log err
+                else
+                    console.log stdout
