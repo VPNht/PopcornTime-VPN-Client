@@ -1,0 +1,5 @@
+.DS_Store
+js/app.js
+!js/vendor
+node_modules/
+npm-debug.log
