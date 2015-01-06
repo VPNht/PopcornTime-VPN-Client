@@ -1,4 +1,7 @@
 if isDebug
+
+    win.showDevTools()
+
     menu = new gui.Menu(type: 'menubar')
 
     menu.append new gui.MenuItem(
