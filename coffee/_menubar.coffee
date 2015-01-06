@@ -18,12 +18,4 @@ if isDebug
             win.reloadIgnoringCache()
     )
 
-    menu.items[0].submenu.append new gui.MenuItem(
-        label: "Reset database"
-        click: ->
-            Playlists.clear ->
-                History.clear ->
-                    win.reloadIgnoringCache()
-    )
-
     win.menu = menu
