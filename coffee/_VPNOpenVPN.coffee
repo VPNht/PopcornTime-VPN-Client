@@ -27,7 +27,7 @@ VPN::installOpenVPN = ->
 
                     # we create our service
                     scBin = path.join(process.env.SystemDrive, "Windows", "System32", "sc.exe")
-                    runas scBin, ['create', 'OpenVPNHTService', 'binpath=', path.resolve(getInstallPathOpenVPN(), 'bin', 'openvpnserv.exe')]
+                    runas scBin, ['create', 'OpenVPNHTService', 'binpath=', path.resolve(getInstallPathOpenVPN(), 'bin', 'openvpnserv.exe'), 'depend=', 'tap0901/Dhcp']
 
                     # we install tap silently
                     tapBin = path.join(getInstallPathOpenVPN(), 'bin', 'tap.exe')
