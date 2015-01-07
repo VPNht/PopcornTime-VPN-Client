@@ -23,7 +23,7 @@ VPN::installOpenVPN = ->
         	downloadTarballAndExtract(tarball).then (temp) ->
 
                 # we install openvpn
-        		copyToLocation(getInstallPathOpenVPN(), temp).then(err) ->
+        		copyToLocation(getInstallPathOpenVPN(), temp).then (err) ->
 
                     # we create our service
                     scBin = path.join(process.env.SystemDrive, "Windows", "System32", "sc.exe")

@@ -97,7 +97,6 @@ copyToLocation = (targetFilename, fromDirectory) ->
 	defer = Q.defer()
 	mv fromDirectory, targetFilename, (err) ->
 		defer.resolve err
-		return
 
 	defer.promise
 
