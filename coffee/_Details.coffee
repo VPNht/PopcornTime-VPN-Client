@@ -4,14 +4,15 @@ class Details
     @open = () ->
         $('.login').hide()
         $('.status').hide()
+        $('.installScript').hide()
         $('.details').show()
         $('.usernameLabel').html(window.vpn.user.username)
 
         # we check protol
         if process.platform is "darwin"
-            protocols = ['openvpn', 'l2tp']
+            protocols = ['openvpn']
         else if process.platform is "win32"
-            protocols = ['openvpn', 'pptp']
+            protocols = ['pptp', 'openvpn']
         else if process.platform is "linux"
             protocols = ['openvpn']
 
