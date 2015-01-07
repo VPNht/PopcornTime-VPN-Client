@@ -128,9 +128,8 @@ copy = (source, target, cb) ->
 	return
 
 runas = (cmd, args, options) ->
-	runasApp = undefined
+	exec = require("child_process").exec
 	if process.platform is "linux"
-		exec = require("child_process").exec
 		child = exec "which gksu", (error, stdout, stderr) ->
 
 		if stdout
@@ -150,13 +149,11 @@ runas = (cmd, args, options) ->
 					InstallScript.open()
 		
 	else if process.platform is "win32"
-		exec = require("child_process").exec
 		cmd = path.join(getInstallPathOpenVPN(), 'bin', 'runas.cmd') + " " + cmd + " " + args.join(" ")
 		child = exec cmd, (error, stdout, stderr) ->
 			1 if error isnt null
 			0
 	else
-		exec = require("child_process").exec
 		cmd = "osascript -e 'do shell script \"" + cmd + " " + args.join(" ") + " \" with administrator privileges'"
 		child = exec cmd, (error, stdout, stderr) ->
 			1 if error isnt null
