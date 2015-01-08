@@ -5,7 +5,7 @@ getStatus = (callback) ->
     request
         url: 'https://vpn.ht/status?json'
         , (error, response, body) ->
-            return callback false if err
+            return callback false if error
             if response and response.statusCode == 200
                 body = JSON.parse(body)
                 callback body
