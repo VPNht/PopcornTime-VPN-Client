@@ -197,7 +197,7 @@ getPidOpenVPN = ->
 # helper to get vpn install path
 getInstallPathOpenVPN = (type) ->
     type = type || false
-	if type == 'service'
+    if type == 'service'
         return path.join(process.env.USERPROFILE, 'vpnht');
     else
         return path.join(process.cwd(), "openvpn")
