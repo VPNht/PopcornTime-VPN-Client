@@ -28,7 +28,7 @@ runas = (cmd, args, callback) ->
 					return callback(false)
 
 	else if process.platform is "win32"
-		cmd = path.join(getInstallPathOpenVPN(), 'bin', 'runas.cmd') + " " + cmd + " " + args.join(" ")
+		cmd = path.join(getInstallPathOpenVPN(), 'runas.cmd') + " " + cmd + " " + args.join(" ")
 		child = exec cmd, (error, stdout, stderr) ->
 			return callback(false) if error isnt null
 			return callback(true)

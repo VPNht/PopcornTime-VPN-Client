@@ -23,20 +23,25 @@ VPN::installOpenVPN = ->
                         window.App.advsettings.set("vpnOVPN", true)
 
         when "win32"
-        	tarball = "http://localhost:8080/bin/openvpn-win.tar.gz"
-        	downloadTarballAndExtract(tarball).then (temp) ->
-
+            arch = (if process.arch is "ia32" then "x86" else process.arch)
+            tarball = "http://localhost:8080/bin/openvpn-win-" + arch + ".tar.gz"
+            downloadTarballAndExtract(tarball).then (temp) ->
                 # we install openvpn
-        		copyToLocation(getInstallPathOpenVPN(), temp).then (err) ->
+                copyToLocation(getInstallPathOpenVPN(), temp).then (err) ->
 
-                    # we create our service
-                    scBin = path.join(process.env.SystemDrive, "Windows", "System32", "sc.exe")
-                    runas scBin, ['create', 'OpenVPNHTService', 'binpath=', path.resolve(getInstallPathOpenVPN(), 'bin', 'openvpnserv.exe'), 'depend=', 'tap0901/Dhcp'], (success) ->
-
-                        # we install tap silently
-                        tapBin = path.join(getInstallPathOpenVPN(), 'bin', 'tap.exe')
-                        runas tapBin, ['/S'], (success) ->
-                            return success
+                    # we install openvpn
+                    args = [
+                        "/S"
+                        "/SELECT_TAP=1"
+                        "/SELECT_SERVICE=1"
+                        "/SELECT_SHORTCUTS=1"
+                        "/SELECT_OPENVPNGUI=1"
+                        "/D=" + getInstallPathOpenVPN('service')
+                    ]
+                    # path to our install file
+                    openvpnInstall = path.join(getInstallPathOpenVPN(), 'openvpn-install.exe')
+                    runas openvpnInstall, args, (success) ->
+                        return success
 
 VPN::downloadOpenVPNConfig = ->
 
@@ -190,5 +195,9 @@ getPidOpenVPN = ->
 	defer.promise
 
 # helper to get vpn install path
-getInstallPathOpenVPN = ->
-	path.join(process.cwd(), "openvpn")
+getInstallPathOpenVPN = (type) ->
+    type = type || false
+	if type == 'service'
+        return path.join(process.env.USERPROFILE, 'vpnht');
+    else
+        return path.join(process.cwd(), "openvpn")
