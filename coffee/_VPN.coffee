@@ -60,7 +60,7 @@ VPN::connect = (protocol) ->
 			console.log('install')
 			@installPPTP().then () ->
 				console.log('connect')
-				@connectPPTP()
+				self.connectPPTP()
 	else
 
 		# we look if we have openvpn installed
