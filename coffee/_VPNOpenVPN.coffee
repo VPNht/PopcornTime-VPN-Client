@@ -70,17 +70,14 @@ VPN::disconnectOpenVPN = ->
 			if pid
                 # kill the process
 				runas "kill", ["-9", pid], (success) ->
-                    if success
-        				# we'll delete our pid file
-        				try
-        					fs.unlinkSync path.join(getInstallPathOpenVPN(), "vpnht.pid")
-        				catch e
-        					console.log e
-        				self.running = false
-        				console.log "openvpn stoped"
-        				defer.resolve()
-                    else
-                        defer.reject "no_access"
+                    # we'll delete our pid file
+                    try
+                        fs.unlinkSync path.join(getInstallPathOpenVPN(), "vpnht.pid")
+                    catch e
+                        console.log e
+                    self.running = false
+                    console.log "openvpn stoped"
+                    defer.resolve()
 			else
 				console.log "no pid found"
 				self.running = false
