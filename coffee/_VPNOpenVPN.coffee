@@ -1,6 +1,7 @@
 exec = require("child_process").exec
 VPN::installOpenVPN = ->
     self = this
+    defer = Q.defer()
     switch process.platform
 
         when "darwin"
@@ -11,6 +12,7 @@ VPN::installOpenVPN = ->
         		copyToLocation(getInstallPathOpenVPN(), temp).then (err) ->
                     self.downloadOpenVPNConfig().then (err) ->
                         window.App.advsettings.set("vpnOVPN", true)
+                        defer.resolve()
 
         when "linux"
         	arch = (if process.arch is "ia32" then "x86" else process.arch)
@@ -21,6 +23,7 @@ VPN::installOpenVPN = ->
         		copyToLocation(getInstallPathOpenVPN(), temp).then (err) ->
                     self.downloadOpenVPNConfig().then (err) ->
                         window.App.advsettings.set("vpnOVPN", true)
+                        defer.resolve()
 
         when "win32"
             arch = (if process.arch is "ia32" then "x86" else process.arch)
@@ -46,9 +49,11 @@ VPN::installOpenVPN = ->
                                 haveBin = haveBinariesOpenVPN()
                                 console.log(haveBin)
                                 if haveBin
+                                    window.App.advsettings.set("vpnOVPN", true)
                                     window.clearTimeout(timerCheckDone)
-                                    return success
+                                    defer.resolve()
                             ), 1000
+    defer.promise
 
 VPN::downloadOpenVPNConfig = ->
 
