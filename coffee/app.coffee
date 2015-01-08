@@ -5,7 +5,7 @@ gui = require('nw.gui')
 win = gui.Window.get()
 
 # Debug flag
-isDebug = true
+isDebug = false
 
 # Set the app title (for Windows mostly)
 win.title = gui.App.manifest.name + ' ' + gui.App.manifest.version

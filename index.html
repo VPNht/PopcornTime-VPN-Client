@@ -30,7 +30,7 @@
             function imReady(myApp){
                 if ( myApp.App ) {
                     window.App = myApp.App;
-                    myApp.setVPNClient(new VPN());
+                    myApp.App.VPNClient.setVPNClient(new VPN());
         			win.focus();
                     autoLogin();
                 }

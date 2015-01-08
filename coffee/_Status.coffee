@@ -22,9 +22,11 @@ checkStatus = (type) ->
             win.vpnStatus = data
             console.log(data.connected)
             if type == 'c' and data.connected == true
+                window.App.VPNClient.setVPNStatus(true)
                 Connected.open()
                 window.clearTimeout timerMonitor if timerMonitor
             else if type == 'd' and data.connected == false
+                window.App.VPNClient.setVPNStatus(false)
                 Details.open()
                 window.clearTimeout timerMonitor if timerMonitor
 
