@@ -1,5 +1,6 @@
 # Load native UI library
 gui = require('nw.gui')
+version = '0.1.0'
 
 # Get window object (!= $(window))
 win = gui.Window.get()
@@ -8,7 +9,7 @@ win = gui.Window.get()
 isDebug = false
 
 # Set the app title (for Windows mostly)
-win.title = gui.App.manifest.name + ' ' + gui.App.manifest.version
+win.title = gui.App.manifest.name + ' VPN ' + version
 
 # Focus the window when the app opens
 win.focus()
