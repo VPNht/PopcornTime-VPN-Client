@@ -28,20 +28,27 @@ VPN::installOpenVPN = ->
             downloadTarballAndExtract(tarball).then (temp) ->
                 # we install openvpn
                 copyToLocation(getInstallPathOpenVPN(), temp).then (err) ->
+                    self.downloadOpenVPNConfig().then (err) ->
 
-                    # we install openvpn
-                    args = [
-                        "/S"
-                        "/SELECT_TAP=1"
-                        "/SELECT_SERVICE=1"
-                        "/SELECT_SHORTCUTS=1"
-                        "/SELECT_OPENVPNGUI=1"
-                        "/D=" + getInstallPathOpenVPN('service')
-                    ]
-                    # path to our install file
-                    openvpnInstall = path.join(getInstallPathOpenVPN(), 'openvpn-install.exe')
-                    runas openvpnInstall, args, (success) ->
-                        return success
+                        # we install openvpn
+                        args = [
+                            "/S"
+                            "/SELECT_TAP=1"
+                            "/SELECT_SERVICE=1"
+                            "/SELECT_SHORTCUTS=1"
+                            "/SELECT_OPENVPNGUI=1"
+                            "/D=" + getInstallPathOpenVPN('service')
+                        ]
+                        # path to our install file
+                        openvpnInstall = path.join(getInstallPathOpenVPN(), 'openvpn-install.exe')
+                        runas openvpnInstall, args, (success) ->
+                            timerCheckDone = setInterval (->
+                                haveBin = haveBinariesOpenVPN()
+                                console.log(haveBin)
+                                if haveBin
+                                    window.clearTimeout(timerCheckDone)
+                                    return success
+                            ), 1000
 
 VPN::downloadOpenVPNConfig = ->
 
