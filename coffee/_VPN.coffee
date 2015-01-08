@@ -76,7 +76,15 @@ VPN::disconnect = () ->
 	console.log(@protocol)
 	self = this
 	if @running and @protocol == 'pptp'
-		self.disconnectPPTP()
+		monitorStatus('d')
+		return self.disconnectPPTP()
+
 	else if @running and @protocol == 'openvpn'
-		console.log('disonnect openvpn')
-		self.disconnectOpenVPN()
+		monitorStatus('d')
+		return self.disconnectOpenVPN()
+
+	else
+		# we try all !
+		self.disconnectOpenVPN().then () ->
+			self.disconnectPPTP().then () ->
+				monitorStatus('d')

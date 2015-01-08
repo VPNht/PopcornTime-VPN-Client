@@ -62,7 +62,6 @@ VPN::disconnectOpenVPN = ->
 		# we need to stop the service
 		runas netBin, ["stop", "OpenVPNHTService"], (success) ->
             # update ip
-    		self.getIp()
     		self.running = false
     		console.log "openvpn stoped"
     		defer.resolve()
@@ -71,16 +70,17 @@ VPN::disconnectOpenVPN = ->
 			if pid
                 # kill the process
 				runas "kill", ["-9", pid], (success) ->
-    				# we'll delete our pid file
-    				try
-    					fs.unlinkSync path.join(getInstallPathOpenVPN(), "vpnht.pid")
-    				catch e
-    					console.log e
-                    # update ip
-    				self.getIp()
-    				self.running = false
-    				console.log "openvpn stoped"
-    				defer.resolve()
+                    if success
+        				# we'll delete our pid file
+        				try
+        					fs.unlinkSync path.join(getInstallPathOpenVPN(), "vpnht.pid")
+        				catch e
+        					console.log e
+        				self.running = false
+        				console.log "openvpn stoped"
+        				defer.resolve()
+                    else
+                        defer.reject "no_access"
 			else
 				console.log "no pid found"
 				self.running = false
@@ -146,8 +146,6 @@ VPN::connectOpenVPN = ->
                                 self.running = true
                                 self.protocol = 'openvpn'
                                 console.log "openvpn launched"
-                                # set our current ip
-                                self.getIp()
                                 defer.resolve()
 
                 else
@@ -165,7 +163,6 @@ VPN::connectOpenVPN = ->
                         runas openvpn, args, (success) ->
                             self.running = true
                             self.protocol = 'openvpn'
-                            self.getIp()
                             defer.resolve()
 
             else

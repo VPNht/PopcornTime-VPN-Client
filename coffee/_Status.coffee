@@ -11,18 +11,24 @@ getStatus = (callback) ->
             else
                 callback false
 
-
-checkStatus = ->
-    console.log('monitoring status....')
+# checkStatus type
+# c = connect minitoring
+# d = disconnect monitoring
+checkStatus = (type) ->
+    type = type || 'c'
+    console.log('monitoring status....', type)
     getStatus (data) ->
         if data
             win.vpnStatus = data
             console.log(data.connected)
-            if data.connected eq true
+            if type == 'c' and data.connected == true
                 Connected.open()
                 window.clearTimeout timerMonitor if timerMonitor
+            else if type == 'd' and data.connected == false
+                Details.open()
+                window.clearTimeout timerMonitor if timerMonitor
 
-monitorStatus = ->
+monitorStatus = (type) ->
     timerMonitor = setInterval (->
-        checkStatus()
+        checkStatus(type)
     ), 2500

@@ -16,6 +16,10 @@ VPN::installPPTP = ->
                     else
                         window.App.advsettings.set("vpnPPTP", true)
                         defer.resolve true
+
+        else
+            defer.resolve false
+
     defer.promise
 
 # pptp connection
@@ -36,6 +40,10 @@ VPN::connectPPTP = ->
                     self.protocol = 'pptp'
                     self.running = true
                     defer.resolve true
+
+        else
+            defer.resolve false
+
     defer.promise
 
 VPN::disconnectPPTP = ->
@@ -52,4 +60,8 @@ VPN::disconnectPPTP = ->
                     console.log stdout
                     self.running = false
                     defer.resolve true
+
+        else
+            defer.resolve false
+            
     defer.promise
