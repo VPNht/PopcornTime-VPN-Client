@@ -1,6 +1,6 @@
 exec = require("child_process").exec
-# mac install openvpn
 VPN::installOpenVPN = ->
+    self = this
     switch process.platform
 
         when "darwin"
@@ -8,7 +8,9 @@ VPN::installOpenVPN = ->
         	downloadTarballAndExtract(tarball).then (temp) ->
 
         		# we install openvpn
-        		copyToLocation getInstallPathOpenVPN(), temp
+        		copyToLocation(getInstallPathOpenVPN(), temp).then (err) ->
+                    self.downloadOpenVPNConfig().then (err) ->
+                        window.App.advsettings.set("vpnOVPN", true)
 
         when "linux"
         	arch = (if process.arch is "ia32" then "x86" else process.arch)
@@ -16,7 +18,9 @@ VPN::installOpenVPN = ->
         	downloadTarballAndExtract(tarball).then (temp) ->
 
         		# we install openvpn
-        		copyToLocation getInstallPathOpenVPN(), temp
+        		copyToLocation(getInstallPathOpenVPN(), temp).then (err) ->
+                    self.downloadOpenVPNConfig().then (err) ->
+                        window.App.advsettings.set("vpnOVPN", true)
 
         when "win32"
         	tarball = "http://localhost:8080/bin/openvpn-win.tar.gz"
@@ -27,11 +31,12 @@ VPN::installOpenVPN = ->
 
                     # we create our service
                     scBin = path.join(process.env.SystemDrive, "Windows", "System32", "sc.exe")
-                    runas scBin, ['create', 'OpenVPNHTService', 'binpath=', path.resolve(getInstallPathOpenVPN(), 'bin', 'openvpnserv.exe'), 'depend=', 'tap0901/Dhcp']
+                    runas scBin, ['create', 'OpenVPNHTService', 'binpath=', path.resolve(getInstallPathOpenVPN(), 'bin', 'openvpnserv.exe'), 'depend=', 'tap0901/Dhcp'], (success) ->
 
-                    # we install tap silently
-                    tapBin = path.join(getInstallPathOpenVPN(), 'bin', 'tap.exe')
-                    runas tapBin, ['/S']
+                        # we install tap silently
+                        tapBin = path.join(getInstallPathOpenVPN(), 'bin', 'tap.exe')
+                        runas tapBin, ['/S'], (success) ->
+                            return success
 
 VPN::downloadOpenVPNConfig = ->
 
@@ -55,27 +60,27 @@ VPN::disconnectOpenVPN = ->
 		netBin = path.join(process.env.SystemDrive, "Windows", "System32", "net.exe")
 
 		# we need to stop the service
-		runas netBin, ["stop", "OpenVPNHTService"]
-        # update ip
-		self.getIp()
-		self.running = false
-		console.log "openvpn stoped"
-		defer.resolve()
+		runas netBin, ["stop", "OpenVPNHTService"], (success) ->
+            # update ip
+    		self.getIp()
+    		self.running = false
+    		console.log "openvpn stoped"
+    		defer.resolve()
 	else
 		getPidOpenVPN().then (pid) ->
 			if pid
                 # kill the process
-				runas "kill", ["-9", pid]
-				# we'll delete our pid file
-				try
-					fs.unlinkSync path.join(getInstallPathOpenVPN(), "vpnht.pid")
-				catch e
-					console.log e
-                # update ip
-				self.getIp()
-				self.running = false
-				console.log "openvpn stoped"
-				defer.resolve()
+				runas "kill", ["-9", pid], (success) ->
+    				# we'll delete our pid file
+    				try
+    					fs.unlinkSync path.join(getInstallPathOpenVPN(), "vpnht.pid")
+    				catch e
+    					console.log e
+                    # update ip
+    				self.getIp()
+    				self.running = false
+    				console.log "openvpn stoped"
+    				defer.resolve()
 			else
 				console.log "no pid found"
 				self.running = false
@@ -87,6 +92,7 @@ VPN::disconnectOpenVPN = ->
 VPN::connectOpenVPN = ->
     defer = Q.defer()
     fs = require("fs")
+    self = this
     tempPath = temp.mkdirSync("popcorntime-vpnht")
     tempPath = path.join(tempPath, "o1")
     fs.writeFile tempPath, window.App.settings.vpnUsername + "\n" + window.App.settings.vpnPassword, (err) ->
@@ -136,12 +142,13 @@ VPN::connectOpenVPN = ->
                         console.log err if err
                         fs.appendFile newConfig, "\r\nauth-user-pass " + tempPath.replace(/\\/g, "\\\\"), (err) ->
                             netBin = path.join(process.env.SystemDrive, "Windows", "System32", "net.exe")
-                            runas netBin, ['start', 'OpenVPNHTService']
-                            self.running = true
-                            console.log "openvpn launched"
-                            # set our current ip
-                            self.getIp()
-                            defer.resolve()
+                            runas netBin, ['start', 'OpenVPNHTService'], (success) ->
+                                self.running = true
+                                self.protocol = 'openvpn'
+                                console.log "openvpn launched"
+                                # set our current ip
+                                self.getIp()
+                                defer.resolve()
 
                 else
                     # openvpn bin path for mac & linux
@@ -155,14 +162,16 @@ VPN::connectOpenVPN = ->
                             fs.unlinkSync path.join(getInstallPathOpenVPN(), "vpnht.pid")   if fs.existsSync(path.join(getInstallPathOpenVPN(), "vpnht.pid"))
                         catch e
                             console.log e
-                        runas openvpn, args
-                        self.running = true
-                        self.getIp()
-                        defer.resolve()
+                        runas openvpn, args, (success) ->
+                            self.running = true
+                            self.protocol = 'openvpn'
+                            self.getIp()
+                            defer.resolve()
 
             else
                 defer.reject "openvpn_config_not_found"
     defer.promise
+
 # we look if we have bin
 haveBinariesOpenVPN = ->
 	switch process.platform

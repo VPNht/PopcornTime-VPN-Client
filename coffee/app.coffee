@@ -20,6 +20,7 @@ win.on "new-win-policy", (frame, url, policy) ->
 # Prevent dragging/dropping files into/outside the window
 preventDefault = (e) ->
     e.preventDefault()
+
 window.addEventListener "dragover", preventDefault, false
 window.addEventListener "drop", preventDefault, false
 window.addEventListener "dragstart", preventDefault, false
@@ -33,10 +34,3 @@ $ ->
 
     $('#windowControlClose').on 'click', ->
         win.close()
-
-autoLogin = ->
-    # we check if we have existing login and we auto login
-    if window.App and window.App.settings.vpnUsername and window.App.settings.vpnPassword
-        $('#username').val(window.App.settings.vpnUsername)
-        $('#password').val(window.App.settings.vpnPassword)
-        login()

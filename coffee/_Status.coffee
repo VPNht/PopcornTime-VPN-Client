@@ -1,4 +1,5 @@
 request = require('request')
+timerMonitor = false
 
 getStatus = (callback) ->
     request
@@ -12,8 +13,16 @@ getStatus = (callback) ->
 
 
 checkStatus = ->
+    console.log('monitoring status....')
     getStatus (data) ->
         if data
             win.vpnStatus = data
-            if data.connected == true
+            console.log(data.connected)
+            if data.connected eq true
                 Connected.open()
+                window.clearTimeout timerMonitor if timerMonitor
+
+monitorStatus = ->
+    timerMonitor = setInterval (->
+        checkStatus()
+    ), 2500

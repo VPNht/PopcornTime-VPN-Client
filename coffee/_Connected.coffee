@@ -1,7 +1,6 @@
 _ = require('underscore')
 class Connected
 
-    @open = () ->
-        $('.login').hide()
-        $('.details').hide()
+    @open = ->
+        hideAll()
         $('.status').show()
