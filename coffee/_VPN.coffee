@@ -57,7 +57,9 @@ VPN::connect = (protocol) ->
 		if pptpEnabled
 			return @connectPPTP()
 		else
+			console.log('install')
 			@installPPTP().then () ->
+				console.log('connect')
 				@connectPPTP()
 	else
 
