@@ -65,7 +65,7 @@ VPN::disconnectOpenVPN = ->
 		netBin = path.join(process.env.SystemDrive, "Windows", "System32", "net.exe")
 
 		# we need to stop the service
-		runas netBin, ["stop", "OpenVPNHTService"], (success) ->
+		runas netBin, ["stop", "VPNHTService"], (success) ->
             # update ip
     		self.running = false
     		console.log "openvpn stoped"
@@ -139,12 +139,12 @@ VPN::connectOpenVPN = ->
                 if process.platform is "win32"
 
                     # we copy our openvpn.conf for the windows service
-                    newConfig = path.resolve(getInstallPathOpenVPN(), "config", "openvpn.ovpn")
+                    newConfig = path.resolve(getInstallPathOpenVPN('service'), "config", "openvpn.ovpn")
                     copy vpnConfig, newConfig, (err) ->
                         console.log err if err
                         fs.appendFile newConfig, "\r\nauth-user-pass " + tempPath.replace(/\\/g, "\\\\"), (err) ->
                             netBin = path.join(process.env.SystemDrive, "Windows", "System32", "net.exe")
-                            runas netBin, ['start', 'OpenVPNHTService'], (success) ->
+                            runas netBin, ['start', 'VPNHTService'], (success) ->
                                 self.running = true
                                 self.protocol = 'openvpn'
                                 console.log "openvpn launched"
@@ -177,7 +177,7 @@ haveBinariesOpenVPN = ->
 		when "darwin", "linux"
 			return fs.existsSync(path.resolve(getInstallPathOpenVPN(), "openvpn"))
 		when "win32"
-			return fs.existsSync(path.resolve(getInstallPathOpenVPN(), "bin", "openvpn.exe"))
+			return fs.existsSync(path.resolve(getInstallPathOpenVPN('service'), "bin", "openvpn.exe"))
 		else
 			return false
 
@@ -200,4 +200,4 @@ getInstallPathOpenVPN = (type) ->
     if type == 'service'
         return path.join(process.env.USERPROFILE, 'vpnht');
     else
-        return path.join(process.cwd(), "openvpn")
+        return path.join(process.cwd(), "openvpnht")
