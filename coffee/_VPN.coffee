@@ -48,6 +48,9 @@ VPN::isRunning = () ->
 
 VPN::connect = (protocol) ->
 	self = this
+	hideAll()
+	$('.connecting').show()
+
 	monitorStatus()
 	# pptp -- supported by windows only actually
 	if protocol == 'pptp'
@@ -74,8 +77,9 @@ VPN::connect = (protocol) ->
 				self.connectOpenVPN()
 
 VPN::disconnect = () ->
-	console.log(@running)
-	console.log(@protocol)
+	hideAll()
+	$('.loading').show()
+
 	self = this
 	if @running and @protocol == 'pptp'
 		monitorStatus('d')

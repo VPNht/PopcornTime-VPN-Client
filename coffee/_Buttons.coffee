@@ -17,6 +17,9 @@ $ ->
     $('#disconnectBtn').on 'click', ->
         App.VPN.disconnect();
 
+    $('#cancelBtn').on 'click', ->
+        App.VPN.disconnect();
+
     $('#createAccount').on 'click', ->
         gui.Shell.openExternal('https://vpn.ht/popcorntime');
 

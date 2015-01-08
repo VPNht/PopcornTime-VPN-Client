@@ -3,6 +3,8 @@ hideAll = ->
     $('.status').hide()
     $('.installScript').hide()
     $('.details').hide()
+    $('.connecting').hide()
+    $('.loading').hide()
 
 autoLogin = ->
     # we check if we have existing login and we auto login
