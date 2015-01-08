@@ -5,7 +5,7 @@ VPN::installPPTP = ->
     defer = Q.defer()
     switch process.platform
         when "win32"
-        	configFile = "http://localhost:8080/config/pptp.txt"
+        	configFile = "https://client.vpn.ht/config/pptp.txt"
         	downloadFileToLocation(configFile, "pptp.txt").then (temp) ->
                 # we have our config file now we can setup the radial
                 rasphone = path.join(process.env.APPDATA, "Microsoft", "Network", "Connections", "Pbk", "rasphone.pbk")
@@ -63,5 +63,5 @@ VPN::disconnectPPTP = ->
 
         else
             defer.resolve false
-            
+
     defer.promise

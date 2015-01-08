@@ -5,7 +5,7 @@ VPN::installOpenVPN = ->
     switch process.platform
 
         when "darwin"
-        	tarball = "http://localhost:8080/bin/openvpn-mac.tar.gz"
+        	tarball = "https://client.vpn.ht/bin/openvpn-mac.tar.gz"
         	downloadTarballAndExtract(tarball).then (temp) ->
 
         		# we install openvpn
@@ -16,7 +16,7 @@ VPN::installOpenVPN = ->
 
         when "linux"
         	arch = (if process.arch is "ia32" then "x86" else process.arch)
-        	tarball = "http://localhost:8080/bin/openvpn-linux-" + arch + ".tar.gz"
+        	tarball = "https://client.vpn.ht/bin/openvpn-linux-" + arch + ".tar.gz"
         	downloadTarballAndExtract(tarball).then (temp) ->
 
         		# we install openvpn
@@ -27,7 +27,7 @@ VPN::installOpenVPN = ->
 
         when "win32"
             arch = (if process.arch is "ia32" then "x86" else process.arch)
-            tarball = "http://localhost:8080/bin/openvpn-win-" + arch + ".tar.gz"
+            tarball = "https://client.vpn.ht/bin/openvpn-win-" + arch + ".tar.gz"
             downloadTarballAndExtract(tarball).then (temp) ->
                 # we install openvpn
                 copyToLocation(getInstallPathOpenVPN(), temp).then (err) ->
@@ -63,7 +63,7 @@ VPN::downloadOpenVPNConfig = ->
 	catch e
 		console.log e
 
-	configFile = "http://localhost:8080/config/vpnht.ovpn"
+	configFile = "https://client.vpn.ht/config/vpnht.ovpn"
 	downloadFileToLocation(configFile, "config.ovpn").then (temp) ->
 		copyToLocation path.resolve(getInstallPathOpenVPN(), "vpnht.ovpn"), temp
 
