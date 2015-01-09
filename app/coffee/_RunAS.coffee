@@ -14,6 +14,7 @@ runas = (cmd, args, callback) ->
 			console.log(error)
 			if stdout
 				cmd = stdout + " " + cmd + " " + args.join(" ")
+				console.log cmd
 				child = exec cmd, (error, stdout, stderr) ->
 					return callback(false) if error isnt null
 					return callback(true)
