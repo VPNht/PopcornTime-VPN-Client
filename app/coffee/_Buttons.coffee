@@ -1,8 +1,5 @@
 $ ->
-    $('#username').keypress (e) ->
-        Auth.login() if e.which is 13
-
-    $('#password').keypress (e) ->
+    $('#username,#password').keypress (e) ->
         Auth.login() if e.which is 13
 
     $('#login').on 'click', ->
@@ -14,16 +11,13 @@ $ ->
     $('#connectBtn').on 'click', ->
         App.VPN.connect($('#protocol').val());
 
-    $('#disconnectBtn').on 'click', ->
-        App.VPN.disconnect();
-
-    $('#cancelBtn').on 'click', ->
+    $('#cancelBtn,#disconnectBtn').on 'click', ->
         App.VPN.disconnect();
 
     $('#createAccount').on 'click', ->
         gui.Shell.openExternal('https://vpn.ht/popcorntime');
 
-    $('#helpBtn').on 'click', ->
+    $('#helpBtn,#helpdeskBtn').on 'click', ->
         gui.Shell.openExternal('https://vpnht.zendesk.com/hc/en-us');
 
     $('#forgotPassword').on 'click', ->
