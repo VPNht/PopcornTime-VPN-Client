@@ -10,22 +10,22 @@ runas = (cmd, args, callback) ->
 	if process.platform is "linux"
 		child = exec "which gksu", (error, stdout, stderr) ->
 
-		if stdout
-			cmd = stdout + " " + cmd + " " + args.join(" ")
-			child = exec cmd, (error, stdout, stderr) ->
-				return callback(false) if error isnt null
-				return callback(true)
-		else
-			child = exec "which kdesu", (error, stdout, stderr) ->
-				if stdout
-					cmd = stdout + " " + cmd + " " + args.join(" ")
-					child = exec cmd, (error, stdout, stderr) ->
-						return callback(false) if error isnt null
-						return callback(true)
-				else
-					# user need to run our script
-					InstallScript.open()
-					return callback(false)
+			if stdout
+				cmd = stdout + " " + cmd + " " + args.join(" ")
+				child = exec cmd, (error, stdout, stderr) ->
+					return callback(false) if error isnt null
+					return callback(true)
+			else
+				child = exec "which kdesu", (error, stdout, stderr) ->
+					if stdout
+						cmd = stdout + " " + cmd + " " + args.join(" ")
+						child = exec cmd, (error, stdout, stderr) ->
+							return callback(false) if error isnt null
+							return callback(true)
+					else
+						# user need to run our script
+						InstallScript.open()
+						return callback(false)
 
 	else if process.platform is "win32"
 		cmd = path.join(getInstallPathOpenVPN(), 'runas.cmd') + " " + cmd + " " + args.join(" ")
