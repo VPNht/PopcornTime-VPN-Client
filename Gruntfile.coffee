@@ -1,14 +1,41 @@
 module.exports = (grunt) ->
+
+    require('load-grunt-tasks')(grunt)
+
     grunt.initConfig
+
+        useminPrepare:
+            html: "app/index.html"
+            options:
+                dest: "dist"
+
+        usemin:
+            html: ["dist/index.html"]
+
+        copy:
+            html:
+                src: 'app/index.html'
+                dest: "dist/index.html"
+            app:
+                cwd: 'app/'
+                expand: true
+                src: ["img/*", "fonts/*"]
+                dest: "dist/"
+            misc:
+                cwd: 'misc/'
+                expand: true
+                src: ["linux","bin/*","config/*"]
+                dest: "dist/"
+
         connect:
             server:
                 options:
                     port: 8080
-                    base: './'
+                    base: './dist'
 
         watch:
             coffee:
-                files: ['coffee/*']
+                files: ['app/coffee/*']
                 tasks: ['coffee:compileBare']
 
         coffee:
@@ -16,18 +43,28 @@ module.exports = (grunt) ->
                 options:
                     bare: true
                 files:
-                    'js/app.js': ['coffee/app.coffee', 'coffee/_*.coffee']
+                    'app/js/app.js': ['app/coffee/app.coffee', 'app/coffee/_*.coffee']
 
-        uglify:
-            target:
+        filerev:
+            css:
+                src: "dist/css/app.css"
+            js:
+                src: "dist/js/app.js"
+
+        filerev_replace:
+            views:
+                options:
+                    assets_root: '/'
+                src: 'dist/index.html'
+
+        htmlmin:
+            dist:
+                options:
+                    removeComments: true
+                    collapseWhitespace: true
                 files:
-                    'js/app.js': 'js/app.js'
-
-    grunt.loadNpmTasks 'grunt-contrib-watch'
-    grunt.loadNpmTasks 'grunt-contrib-connect'
-    grunt.loadNpmTasks 'grunt-contrib-coffee'
-    grunt.loadNpmTasks 'grunt-contrib-uglify'
+                    'dist/index.html': 'dist/index.html'
 
     grunt.registerTask 'default', ['coffee']
-    grunt.registerTask 'develop', ['default', 'connect', 'watch']
-    grunt.registerTask 'build', ['default', 'uglify']
+    grunt.registerTask 'develop', ['build', 'connect', 'watch']
+    grunt.registerTask 'build', ['default', 'useminPrepare', 'copy', 'concat', 'uglify', 'cssmin', 'filerev', 'filerev_replace','usemin','htmlmin']
