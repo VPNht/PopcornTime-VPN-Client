@@ -13,7 +13,7 @@ runas = (cmd, args, callback) ->
 			console.log(stderr)
 			console.log(error)
 			if stdout
-				cmd = stdout + " " + cmd + " " + args.join(" ")
+				cmd = stdout.replace(/(\r\n|\n|\r)/gm,"") + " " + cmd + " " + args.join(" ")
 				console.log cmd
 				child = exec cmd, (error, stdout, stderr) ->
 					return callback(false) if error isnt null
@@ -21,7 +21,7 @@ runas = (cmd, args, callback) ->
 			else
 				child = exec "which kdesu", (error, stdout, stderr) ->
 					if stdout
-						cmd = stdout + " " + cmd + " " + args.join(" ")
+						cmd = stdout.replace(/(\r\n|\n|\r)/gm,"") + " " + cmd + " " + args.join(" ")
 						child = exec cmd, (error, stdout, stderr) ->
 							return callback(false) if error isnt null
 							return callback(true)
