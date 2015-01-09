@@ -6,7 +6,7 @@ version = '0.1.0'
 win = gui.Window.get()
 
 # Debug flag
-isDebug = false
+isDebug = true
 
 # Set the app title (for Windows mostly)
 win.title = gui.App.manifest.name + ' VPN ' + version
