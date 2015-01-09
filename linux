@@ -1,0 +1,154 @@
+#!/bin/bash
+
+# curl -sL https://client.vpn.ht/linux | sudo bash -
+#   or
+# wget -qO- https://client.vpn.ht/linux | sudo bash -
+#
+
+export DEBIAN_FRONTEND=noninteractive
+
+INSTALL_PKGS="openvpn iptables"
+
+print_status() {
+    echo
+    echo "## $1"
+    echo
+}
+
+bail() {
+    echo 'Error executing command, exiting'
+    exit 1
+}
+
+exec_cmd_nobail() {
+    echo "+ $1"
+    bash -c "$1"
+}
+
+exec_cmd() {
+    exec_cmd_nobail "$1" || bail
+}
+
+function detect_gnome()
+{
+    ps -e | grep -E '^.* gnome-session$' > /dev/null
+    if [ $? -ne 0 ];
+    then
+	return 0
+    fi
+    DESKTOP="GNOME"
+    return 1
+}
+
+function detect_kde()
+{
+    ps -e | grep -E '^.* kded4$' > /dev/null
+    if [ $? -ne 0 ];
+    then
+        return 0
+    else
+        DESKTOP="KDE"
+        return 1
+    fi
+}
+
+function detect_unity()
+{
+    ps -e | grep -E '^.* unity-panel$' > /dev/null
+    if [ $? -ne 0 ];
+    then
+	return 0
+    fi
+    DESKTOP="UNITY"
+    return 1
+}
+
+function detect_xfce()
+{
+    ps -e | grep -E '^.* xfce4-session$' > /dev/null
+    if [ $? -ne 0 ];
+    then
+	return 0
+    fi
+    DESKTOP="XFCE"
+    return 1
+}
+
+
+# Find our package manager
+if VERB="$( which apt-get )" 2> /dev/null; then
+    # APT
+    PM='apt'
+    INSTALLVERB='install'
+    UPDATEVERB='update'
+    print_status "Debian-based"
+elif VERB="$( which yum )" 2> /dev/null; then
+    # YUM
+    PM='yum'
+    INSTALLVERB='install -y'
+    UPDATEVERB='update'
+    print_status "Modern Red Hat-based"
+elif VERB="$( which pacman )" 2> /dev/null; then
+    # PACMAN
+    PM='pacman'
+    INSTALLVERB='-S --noconfirm'
+    UPDATEVERB='update'
+    print_status "Arch-based"
+else
+    print_status "Your distro is not supported"
+    exit 1
+fi
+
+DESKTOP="UNKNOWN"
+if detect_gnome;
+then
+    if detect_kde;
+    then
+	if detect_unity;
+	then
+	    detect_xfce
+	fi
+    fi
+fi
+
+# Find desktop Session
+if [ $DESKTOP != 'UNKNOWN' ]; then
+
+    if [ $DESKTOP == 'GNOME' ] || [ $DESKTOP == 'XFCE' ] || [ $DESKTOP == 'UNITY' ]; then
+
+        INSTALL_PKGS="${INSTALL_PKGS} gksu"
+
+    elif [ $DESKTOP == 'KDE' ]; then
+
+        INSTALL_PKGS="${INSTALL_PKGS} kdesu"
+
+    else
+        print_status "Unknown desktop session. Supported: KDE/Gnome/Unity/XFCE"
+        exit 1
+    fi
+
+else
+
+    print_status "Unknown desktop session. Supported: KDE/Gnome"
+    exit 1
+
+fi
+
+# If not pacman we update cache
+if [ $PM != 'pacman' ]
+then
+    # Populating Cache
+    print_status "Executing ${VERB} ${UPDATEVERB}"
+    exec_cmd "${VERB} ${UPDATEVERB}"
+fi
+
+# We install our packages
+print_status "Installing ${INSTALL_PKGS}"
+exec_cmd "${VERB} ${INSTALLVERB} ${INSTALL_PKGS}"
+
+# Mark as success
+touch ~/.vpnhtsuccess
+
+print_status "Congratulation ! All depedencies as been installed."
+
+exit $?
