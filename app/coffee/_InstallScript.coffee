@@ -3,4 +3,4 @@ class InstallScript
 
     @open = ->
         hideAll()
-        $('.installScript').hide()
+        $('.installScript').show()
