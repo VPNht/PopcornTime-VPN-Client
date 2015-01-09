@@ -47,8 +47,10 @@ VPN::installOpenVPN = ->
                         runas openvpnInstall, args, (success) ->
                             timerCheckDone = setInterval (->
                                 haveBin = haveBinariesOpenVPN()
+                                haveTap = haveBinariesTAP()
                                 console.log(haveBin)
-                                if haveBin
+                                console.log(haveTap)
+                                if haveBin and haveTap
                                     window.App.advsettings.set("vpnOVPN", true)
                                     window.clearTimeout(timerCheckDone)
                                     defer.resolve()
@@ -190,6 +192,14 @@ haveBinariesOpenVPN = ->
 			return fs.existsSync(path.resolve(getInstallPathOpenVPN(), "openvpn"))
 		when "win32"
 			return fs.existsSync(path.resolve(getInstallPathOpenVPN('service'), "bin", "openvpn.exe"))
+		else
+			return false
+
+haveBinariesTAP = ->
+	switch process.platform
+		when "win32"
+            # looks for tap exe
+			return fs.existsSync(path.resolve(process.env.ProgramW6432, "TAP-Windows", "bin", "tapinstall.exe"))
 		else
 			return false
 
