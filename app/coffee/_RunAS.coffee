@@ -10,7 +10,7 @@ runas = (cmd, args, callback) ->
 	if process.platform is "linux"
 		child = exec "which gksu", (error, stdout, stderr) ->
 			if stdout
-				cmd = stdout.replace(/(\r\n|\n|\r)/gm,"") + " \"" + cmd + " " + args.join(" ") + "\""
+				cmd = stdout.replace(/(\r\n|\n|\r)/gm,"") + "--description \"VPN.ht\" \"" + cmd + " " + args.join(" ") + "\""
 				console.log cmd
 				child = exec cmd, (error, stdout, stderr) ->
 					return callback(false) if error isnt null
@@ -18,7 +18,7 @@ runas = (cmd, args, callback) ->
 			else
 				child = exec "which kdesu", (error, stdout, stderr) ->
 					if stdout
-						cmd = stdout.replace(/(\r\n|\n|\r)/gm,"") + " \"" + cmd + " " + args.join(" ") + "\""
+						cmd = stdout.replace(/(\r\n|\n|\r)/gm,"") + " -d -c \"" + cmd + " " + args.join(" ") + "\""
 						child = exec cmd, (error, stdout, stderr) ->
 							return callback(false) if error isnt null
 							return callback(true)
