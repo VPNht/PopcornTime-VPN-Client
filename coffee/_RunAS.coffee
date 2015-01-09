@@ -9,7 +9,9 @@ runas = (cmd, args, callback) ->
 	exec = require("child_process").exec
 	if process.platform is "linux"
 		child = exec "which gksu", (error, stdout, stderr) ->
-
+			console.log(stdout)
+			console.log(stderr)
+			console.log(error)
 			if stdout
 				cmd = stdout + " " + cmd + " " + args.join(" ")
 				child = exec cmd, (error, stdout, stderr) ->
