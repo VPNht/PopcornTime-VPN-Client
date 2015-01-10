@@ -20,7 +20,8 @@ checkStatus = (type) ->
             console.log('connection timeout, trying again')
             window.connectionTimeout = false
             clearTimeout window.timerMonitor if window.timerMonitor
-            window.App.VPN.connect(window.App.VPN.protocol)
+            window.App.VPN.disconnect().then () ->
+                window.App.VPN.connect(window.App.VPN.protocol)
         if data
             win.vpnStatus = data
             console.log(data.connected)
