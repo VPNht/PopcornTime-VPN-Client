@@ -14,6 +14,7 @@
         <script src="js/vendor/jquery.min.js"></script>
     	<script src="js/vendor/jquery.migrate.js"></script>
     	<script src="js/vendor/bootstrap.min.js"></script>
+    	<script src="js/vendor/mousetrap.min.js"></script>
     	<script src="js/flat-ui.js"></script>
     	<script src="js/app.js"></script>
         <!-- endbuild -->
@@ -39,8 +40,8 @@
         			win.focus();
                     autoLogin();
                     // mousetrap binding
-                    PopcornTime.Mousetrap.bind(['shift+f12', 'f12', 'command+0'], function (e) {
-	                   win.showDevTools();
+                    window.Mousetrap.bind(['shift+f12', 'f12', 'command+0'], function (e) {
+                        win.showDevTools();
                     });
                 }
             }
