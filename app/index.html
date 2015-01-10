@@ -32,12 +32,16 @@
             // callback to set App.VPN on Popcorn Time
             var gui = require('nw.gui');
             var win = gui.Window.get();
-            function imReady(myApp){
-                if ( myApp.App ) {
-                    window.App = myApp.App;
-                    myApp.App.VPNClient.setVPNClient(new VPN());
+            function imReady(PopcornTime){
+                if ( PopcornTime.App ) {
+                    window.App = PopcornTime.App;
+                    PopcornTime.App.VPNClient.setVPNClient(new VPN());
         			win.focus();
                     autoLogin();
+                    // mousetrap binding
+                    PopcornTime.Mousetrap.bind(['shift+f12', 'f12', 'command+0'], function (e) {
+	                   win.showDevTools();
+                    });
                 }
             }
         </script>
