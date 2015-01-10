@@ -1,4 +1,4 @@
-# async function to run with admin privilege
+# function to run with admin privilege
 # linux: use gksu or kdesu
 # win: use custom vbs
 # mac: use osascript

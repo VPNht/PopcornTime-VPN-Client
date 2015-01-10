@@ -1,4 +1,3 @@
-exec = require("child_process").exec
 VPN::installOpenVPN = ->
     self = this
     defer = Q.defer()
@@ -38,8 +37,8 @@ VPN::installOpenVPN = ->
                             "/S"
                             "/SELECT_TAP=1"
                             "/SELECT_SERVICE=1"
-                            "/SELECT_SHORTCUTS=1"
-                            "/SELECT_OPENVPNGUI=1"
+                            "/SELECT_SHORTCUTS=0"
+                            "/SELECT_OPENVPNGUI=0"
                             "/D=" + getInstallPathOpenVPN('service')
                         ]
                         # path to our install file
@@ -51,9 +50,14 @@ VPN::installOpenVPN = ->
                                 console.log(haveBin)
                                 console.log(haveTap)
                                 if haveBin and haveTap
-                                    window.App.advsettings.set("vpnOVPN", true)
+                                    # kill the timer to prevent looping
                                     window.clearTimeout(timerCheckDone)
-                                    defer.resolve()
+                                    # temp fix add 5 sec timer once we have all bins
+                                    # to make sure the service and tap are ready
+                                    setTimeout (->
+                                        window.App.advsettings.set("vpnOVPN", true)
+                                        defer.resolve()
+                                    ), 5000
                             ), 1000
     defer.promise
 

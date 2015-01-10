@@ -1,4 +1,3 @@
-_ = require('underscore')
 class InstallScript
 
     @open = ->

@@ -1,24 +1,26 @@
-# Load native UI library
+_ = require('underscore')
+request = require('request')
+exec = require("child_process").exec
+Q = require("q")
+tar = require("tar")
+temp = require("temp")
+zlib = require("zlib")
+mv = require("mv")
+fs = require("fs")
+path = require("path")
 gui = require('nw.gui')
-version = '0.1.0'
-
-# Get window object (!= $(window))
 win = gui.Window.get()
-
-# Debug flag
 isDebug = false
+timerMonitor = false
 
-# Set the app title (for Windows mostly)
+version = '0.1.0'
 win.title = gui.App.manifest.name + ' VPN ' + version
 
-# Focus the window when the app opens
 win.focus()
 
-# Cancel all new windows (Middle clicks / New Tab)
 win.on "new-win-policy", (frame, url, policy) ->
     policy.ignore()
 
-# Prevent dragging/dropping files into/outside the window
 preventDefault = (e) ->
     e.preventDefault()
 
@@ -26,10 +28,7 @@ window.addEventListener "dragover", preventDefault, false
 window.addEventListener "drop", preventDefault, false
 window.addEventListener "dragstart", preventDefault, false
 
-########################################################
-
 $ ->
-
     $('#windowControlMinimize').on 'click', ->
         win.minimize()
 

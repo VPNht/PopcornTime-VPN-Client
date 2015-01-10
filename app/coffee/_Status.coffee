@@ -1,6 +1,3 @@
-request = require('request')
-timerMonitor = false
-
 getStatus = (callback) ->
     request
         url: 'https://vpn.ht/status?json'
@@ -25,11 +22,11 @@ checkStatus = (type) ->
             if type == 'c' and data.connected == true
                 window.App.VPNClient.setVPNStatus(true)
                 Connected.open()
-                window.clearTimeout timerMonitor if timerMonitor
+                clearTimer timerMonitor if timerMonitor
             else if type == 'd' and data.connected == false
                 window.App.VPNClient.setVPNStatus(false)
                 Details.open()
-                window.clearTimeout timerMonitor if timerMonitor
+                clearTimer timerMonitor if timerMonitor
 
 monitorStatus = (type) ->
     timerMonitor = setInterval (->

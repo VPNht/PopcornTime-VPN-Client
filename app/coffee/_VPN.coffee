@@ -1,12 +1,3 @@
-request = require("request")
-Q = require("q")
-tar = require("tar")
-temp = require("temp")
-zlib = require("zlib")
-mv = require("mv")
-fs = require("fs")
-path = require("path")
-
 VPN = ->
 	return new VPN() unless this instanceof VPN
 	@running = false

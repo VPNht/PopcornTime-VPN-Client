@@ -13,6 +13,17 @@ autoLogin = ->
         $('#password').val(window.App.settings.vpnPassword)
         Auth.login()
 
+# when we create a new timer it increment
+# the id returned
+# so when we pass it we remove all timer
+# under it as well to prevent multiple
+# timer running
+clearTimer = (maxId) ->
+    i = 0
+    while i < maxId
+        clearTimeout i
+        i += 1
+
 downloadTarballAndExtract = (url) ->
 	defer = Q.defer()
 	tempPath = temp.mkdirSync("popcorntime-openvpn-")

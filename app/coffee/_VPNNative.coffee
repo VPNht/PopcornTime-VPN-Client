@@ -1,5 +1,3 @@
-exec = require("child_process").exec
-
 # install pptp
 VPN::installPPTP = ->
     defer = Q.defer()

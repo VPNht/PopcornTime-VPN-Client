@@ -1,4 +1,3 @@
-request = require('request')
 class Auth
 
     @logout = ->
