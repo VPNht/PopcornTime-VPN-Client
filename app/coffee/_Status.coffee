@@ -35,6 +35,7 @@ checkStatus = (type) ->
                 clearTimeout window.timerMonitor if window.timerMonitor
 
 monitorStatus = (type) ->
+    clearTimeout window.timerMonitor if window.timerMonitor
     window.timerMonitor = setInterval (->
         checkStatus(type)
     ), 2500
