@@ -34,6 +34,11 @@ VPN::connectPPTP = ->
                     console.log err
                     defer.resolve false
                 else
+                    # if not connected after 20sec we send timeout
+                    setTimeout (->
+                        window.connectionTimeout = true;
+                    ), 20000
+
                     console.log stdout
                     self.protocol = 'pptp'
                     self.running = true

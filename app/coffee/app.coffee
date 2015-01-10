@@ -12,6 +12,7 @@ gui = require('nw.gui')
 win = gui.Window.get()
 isDebug = false
 timerMonitor = false
+connectionTimeout = false
 
 version = '0.1.0'
 win.title = gui.App.manifest.name + ' VPN ' + version

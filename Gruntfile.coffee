@@ -36,7 +36,7 @@ module.exports = (grunt) ->
         watch:
             coffee:
                 files: ['app/coffee/*']
-                tasks: ['coffee:compileBare']
+                tasks: ['build']
 
         coffee:
             compileBare:

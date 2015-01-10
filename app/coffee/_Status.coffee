@@ -16,19 +16,24 @@ checkStatus = (type) ->
     type = type || 'c'
     console.log('monitoring status....', type)
     getStatus (data) ->
+        if window.connectionTimeout and !data
+            console.log('connection timeout, trying again')
+            window.connectionTimeout = false
+            clearTimeout window.timerMonitor if window.timerMonitor
+            window.App.VPN.connect(window.App.VPN.protocol)
         if data
             win.vpnStatus = data
             console.log(data.connected)
             if type == 'c' and data.connected == true
                 window.App.VPNClient.setVPNStatus(true)
+                clearTimeout window.timerMonitor if window.timerMonitor
                 Connected.open()
-                clearTimer timerMonitor if timerMonitor
             else if type == 'd' and data.connected == false
                 window.App.VPNClient.setVPNStatus(false)
                 Details.open()
-                clearTimer timerMonitor if timerMonitor
+                clearTimeout window.timerMonitor if window.timerMonitor
 
 monitorStatus = (type) ->
-    timerMonitor = setInterval (->
+    window.timerMonitor = setInterval (->
         checkStatus(type)
     ), 2500
