@@ -38,8 +38,9 @@ VPN::isRunning = () ->
 	defer.promise
 
 VPN::connect = (protocol) ->
-	self = this
 	hideAll()
+	self = this
+	window.connectionTimeout = false
 	$('.connecting').show()
 
 	monitorStatus()
