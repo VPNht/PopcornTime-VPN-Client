@@ -25,7 +25,10 @@ VPN::installOpenVPN = ->
                         defer.resolve()
 
         when "win32"
-            arch = (if process.arch is "ia32" then "x86" else process.arch)
+            if process.env.hasOwnProperty 'PROCESSOR_ARCHITEW6432'
+                arch = 'x64'
+            else arch = (if process.arch is "ia32" then "x86" else process.arch)
+
             tarball = "https://client.vpn.ht/bin/openvpn-win-" + arch + ".tar.gz"
             downloadTarballAndExtract(tarball).then (temp) ->
                 # we install openvpn
