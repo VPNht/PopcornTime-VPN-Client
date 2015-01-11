@@ -44,28 +44,33 @@ VPN::connect = (protocol) ->
 	$('.connecting').show()
 
 	monitorStatus()
+	window.Bugsnag.metaData = vpn:
+		protocol: protocol
+
 	# pptp -- supported by windows only actually
 	if protocol == 'pptp'
 
 		# we look if we have pptp installed
 		pptpEnabled = window.App.advsettings.get("vpnPPTP")
 		if pptpEnabled
+			Debug.info('Client', 'Connecting PPTP')
 			return @connectPPTP()
 		else
-			console.log('install')
+			Debug.info('Client', 'Installing PPTP')
 			@installPPTP().then () ->
-				console.log('connect')
+				Debug.info('Client', 'Connecting PPTP')
 				self.connectPPTP()
 	else
 
 		# we look if we have openvpn installed
 		ovpnEnabled = window.App.advsettings.get("vpnOVPN")
 		if ovpnEnabled and haveBinariesOpenVPN()
+			Debug.info('Client', 'Connecting OpenVPN')
 			return @connectOpenVPN()
 		else
-			console.log('install')
+			Debug.info('Client', 'Installing OpenVPN')
 			@installOpenVPN().then () ->
-				console.log('connect')
+				Debug.info('Client', 'Connecting OpenVPN')
 				self.connectOpenVPN()
 
 VPN::disconnect = () ->
@@ -75,14 +80,17 @@ VPN::disconnect = () ->
 	self = this
 	if @running and @protocol == 'pptp'
 		monitorStatus('d')
+		Debug.info('Client', 'Disconnecting PPTP')
 		return self.disconnectPPTP()
 
 	else if @running and @protocol == 'openvpn'
 		monitorStatus('d')
+		Debug.info('Client', 'Disconnecting OpenVPN')
 		return self.disconnectOpenVPN()
 
 	else
 		# we try all !
+		Debug.info('Client', 'Disconnecting PPTP & OpenVPN')
 		self.disconnectOpenVPN().then () ->
 			self.disconnectPPTP().then () ->
 				monitorStatus('d')

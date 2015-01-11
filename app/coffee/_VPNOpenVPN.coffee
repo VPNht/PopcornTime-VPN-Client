@@ -46,15 +46,13 @@ VPN::installOpenVPN = ->
                         ]
                         # path to our install file
                         openvpnInstall = path.join(getInstallPathOpenVPN(), 'openvpn-install.exe')
-                        console.log('launching', openvpnInstall)
-                        console.log('args', args)
+                        Debug.info('installOpenVPN', 'Downloading OpenVPN configuration file', {openvpnInstall:openvpnInstall, args:args})
 
                         runas openvpnInstall, args, (success) ->
                             timerCheckDone = setInterval (->
                                 haveBin = haveBinariesOpenVPN()
                                 haveTap = haveBinariesTAP()
-                                console.log('haveBin', haveBin)
-                                console.log('haveTap', haveTap)
+                                Debug.info('installOpenVPN', 'Waiting installation', {haveBin:haveBin, haveTap:haveTap})
                                 if haveBin and haveTap
                                     # kill the timer to prevent looping
                                     window.clearTimeout(timerCheckDone)
@@ -68,14 +66,14 @@ VPN::installOpenVPN = ->
     defer.promise
 
 VPN::downloadOpenVPNConfig = ->
-
 	# make sure path exist
 	try
 		fs.mkdirSync getInstallPathOpenVPN() unless fs.existsSync(getInstallPathOpenVPN())
 	catch e
-		console.log e
+        Debug.error('downloadOpenVPNConfig', 'Error', e)
 
-	configFile = "https://client.vpn.ht/config/vpnht.ovpn"
+    configFile = "https://client.vpn.ht/config/vpnht.ovpn"
+    Debug.info('downloadOpenVPNConfig', 'Downloading OpenVPN configuration file', {configFile: configFile})
 	downloadFileToLocation(configFile, "config.ovpn").then (temp) ->
 		copyToLocation path.resolve(getInstallPathOpenVPN(), "vpnht.ovpn"), temp
 
@@ -92,7 +90,7 @@ VPN::disconnectOpenVPN = ->
 		runas netBin, ["stop", "VPNHTService"], (success) ->
             # update ip
     		self.running = false
-    		console.log "openvpn stoped"
+    		Debug.info('disconnectOpenVPN', 'OpenVPN Stopped', {success: success})
     		defer.resolve()
 	else
 		getPidOpenVPN().then (pid) ->
@@ -103,12 +101,13 @@ VPN::disconnectOpenVPN = ->
                     try
                         fs.unlinkSync path.join(getInstallPathOpenVPN(), "vpnht.pid")
                     catch e
-                        console.log e
+                        Debug.info('disconnectOpenVPN', e)
+
                     self.running = false
-                    console.log "openvpn stoped"
+                    Debug.info('disconnectOpenVPN', 'OpenVPN Stopped', {success: success})
                     defer.resolve()
 			else
-				console.log "no pid found"
+				Debug.info('disconnectOpenVPN', 'No pid found')
 				self.running = false
 				defer.reject "no_pid_found"
 			return
@@ -165,7 +164,7 @@ VPN::connectOpenVPN = ->
                     # we copy our openvpn.conf for the windows service
                     newConfig = path.resolve(getInstallPathOpenVPN('service'), "config", "openvpn.ovpn")
                     copy vpnConfig, newConfig, (err) ->
-                        console.log err if err
+                        Debug.error('connectOpenVPN', 'Error preparing openvpn config file', err) if err
                         fs.appendFile newConfig, "\r\nauth-user-pass " + tempPath.replace(/\\/g, "\\\\"), (err) ->
                             netBin = path.join(process.env.SystemDrive, "Windows", "System32", "net.exe")
                             runas netBin, ['start', 'VPNHTService'], (success) ->
@@ -175,7 +174,7 @@ VPN::connectOpenVPN = ->
                                 setTimeout (->
                                     window.connectionTimeout = true;
                                 ), 30000
-                                console.log "openvpn launched"
+                                Debug.info('connectOpenVPN', 'OpenVPN Launched')
                                 defer.resolve()
 
                 else
@@ -189,7 +188,7 @@ VPN::connectOpenVPN = ->
                         try
                             fs.unlinkSync path.join(getInstallPathOpenVPN(), "vpnht.pid")   if fs.existsSync(path.join(getInstallPathOpenVPN(), "vpnht.pid"))
                         catch e
-                            console.log e
+                            Debug.error('connectOpenVPN', 'Error preparing openvpn config file', e)
                         runas openvpn, args, (success) ->
                             self.running = true
                             self.protocol = 'openvpn'

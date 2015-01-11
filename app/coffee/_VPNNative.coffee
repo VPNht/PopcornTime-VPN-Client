@@ -9,9 +9,13 @@ VPN::installPPTP = ->
                 rasphone = path.join(process.env.APPDATA, "Microsoft", "Network", "Connections", "Pbk", "rasphone.pbk")
                 child = exec "type " + temp + " >> " + rasphone, (error, stdout, stderr) ->
                     if error
-                        console.log err
+                        Debug.error('InstallError', err)
                         defer.resolve false
                     else
+
+                        Debug.info('InstallLog', 'PPTP installation successfull')
+                        Debug.info('InstallLog', stdout)
+
                         window.App.advsettings.set("vpnPPTP", true)
                         defer.resolve true
 
@@ -31,7 +35,7 @@ VPN::connectPPTP = ->
 
             child = exec rasdial + " vpnht " + authString, (error, stdout, stderr) ->
                 if error
-                    console.log err
+                    Debug.error('ConnectError', err)
                     defer.resolve false
                 else
                     # if not connected after 10sec we send timeout
@@ -39,7 +43,9 @@ VPN::connectPPTP = ->
                         window.connectionTimeout = true;
                     ), 10000
 
-                    console.log stdout
+                    Debug.info('ConnectLog', 'PPTP connection successfull')
+                    Debug.info('ConnectLog', stdout)
+
                     self.protocol = 'pptp'
                     self.running = true
                     defer.resolve true
@@ -57,10 +63,13 @@ VPN::disconnectPPTP = ->
             rasdial = path.join(process.env.SystemDrive, 'Windows', 'System32', 'rasdial.exe')
             child = exec rasdial + " /disconnect", (error, stdout, stderr) ->
                 if error
-                    console.log err
+                    Debug.error('DisconnectError', err)
                     defer.resolve false
                 else
-                    console.log stdout
+
+                    Debug.info('DisconnectLog', 'PPTP disconnected successfully')
+                    Debug.info('DisconnectLog', stdout)
+
                     self.running = false
                     defer.resolve true
 

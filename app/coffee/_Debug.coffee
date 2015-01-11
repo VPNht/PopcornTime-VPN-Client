@@ -1,24 +1,16 @@
-if isDebug
+class Debug
 
-    win.showDevTools()
+    @error = (errorName, errorMsg, errorLog) ->
+        errorLog = errorLog || {}
+        console.log(errorName + ' ' + errorMsg, errorLog)
+        Bugsnag.notify(errorName, errorMsg, errorLog, "error")
 
-    menu = new gui.Menu(type: 'menubar')
+    @warning = (warningName, warningMsg, warningLog) ->
+        warningLog = warningLog || {}
+        console.log(warningName + ' ' + warningMsg, warningLog)
+        Bugsnag.notify(warningName, warningMsg, warningLog, "warning")
 
-    menu.append new gui.MenuItem(
-        label: 'Tools'
-        submenu: new gui.Menu()
-    )
-
-    menu.items[0].submenu.append new gui.MenuItem(
-        label: 'Developer Tools'
-        click: ->
-            win.showDevTools()
-    )
-
-    menu.items[0].submenu.append new gui.MenuItem(
-        label: "Reload ignoring cache"
-        click: ->
-            win.reloadIgnoringCache()
-    )
-
-    win.menu = menu
+    @info = (infoName, infoMsg, infoLog) ->
+        infoLog = infoLog || {}
+        console.log(infoName + ' ' + infoMsg, infoLog)
+        Bugsnag.notify(infoName, infoMsg, infoLog, "info")

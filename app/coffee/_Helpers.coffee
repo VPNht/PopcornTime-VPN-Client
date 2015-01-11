@@ -7,6 +7,7 @@ hideAll = ->
     $('.loading').hide()
 
 autoLogin = ->
+    Debug.info('autoLogin', window.App.settings.vpnUsername)
     # we check if we have existing login and we auto login
     if window.App and window.App.settings.vpnUsername and window.App.settings.vpnPassword
         $('#username').val(window.App.settings.vpnUsername)
@@ -14,45 +15,41 @@ autoLogin = ->
         Auth.login()
 
 downloadTarballAndExtract = (url) ->
-	defer = Q.defer()
-	tempPath = temp.mkdirSync("popcorntime-openvpn-")
-	stream = tar.Extract(path: tempPath)
-	stream.on "end", ->
-		defer.resolve tempPath
-		return
 
-	stream.on "error", ->
-		defer.resolve false
-		return
+    Debug.info('downloadTarballAndExtract', 'Download tarball', {url: url})
 
-	createReadStream
-		url: url
-	, (requestStream) ->
-		requestStream.pipe(zlib.createGunzip()).pipe stream
-		return
+    defer = Q.defer()
+    tempPath = temp.mkdirSync("popcorntime-openvpn-")
+    stream = tar.Extract(path: tempPath)
+    stream.on "end", ->
+        defer.resolve tempPath
 
-	defer.promise
+    stream.on "error", ->
+        defer.resolve false
+
+    createReadStream url: url, (requestStream) ->
+        requestStream.pipe(zlib.createGunzip()).pipe stream
+
+    defer.promise
 
 downloadFileToLocation = (url, name) ->
-	defer = Q.defer()
-	tempPath = temp.mkdirSync("popcorntime-openvpn-")
-	tempPath = path.join(tempPath, name)
-	stream = fs.createWriteStream(tempPath)
-	stream.on "finish", ->
-		defer.resolve tempPath
-		return
 
-	stream.on "error", ->
-		defer.resolve false
-		return
+    Debug.info('downloadFileToLocation', 'Download file', {name:name, url: url})
 
-	createReadStream
-		url: url
-	, (requestStream) ->
-		requestStream.pipe stream
-		return
+    defer = Q.defer()
+    tempPath = temp.mkdirSync("popcorntime-openvpn-")
+    tempPath = path.join(tempPath, name)
+    stream = fs.createWriteStream(tempPath)
+    stream.on "finish", ->
+        defer.resolve tempPath
 
-	defer.promise
+    stream.on "error", ->
+        defer.resolve false
+
+    createReadStream url: url , (requestStream) ->
+        requestStream.pipe stream
+
+    defer.promise
 
 createReadStream = (requestOptions, callback) ->
 	callback request.get(requestOptions)
@@ -60,11 +57,13 @@ createReadStream = (requestOptions, callback) ->
 
 # move file
 copyToLocation = (targetFilename, fromDirectory) ->
-	defer = Q.defer()
-	mv fromDirectory, targetFilename, (err) ->
-		defer.resolve err
 
-	defer.promise
+    Debug.info('copyToLocation', 'Copy file', {targetFilename: targetFilename, fromDirectory:fromDirectory})
+    defer = Q.defer()
+    mv fromDirectory, targetFilename, (err) ->
+        defer.resolve err
+
+    defer.promise
 
 
 # copy instead of mv (so we keep original)

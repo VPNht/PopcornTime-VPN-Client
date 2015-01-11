@@ -11,7 +11,7 @@ runas = (cmd, args, callback) ->
 		child = exec "which gksu", (error, stdout, stderr) ->
 			if stdout
 				cmd = stdout.replace(/(\r\n|\n|\r)/gm,"") + " --description \"VPN.ht\" \"" + cmd + " " + args.join(" ") + "\""
-				console.log cmd
+				Debug.info('runas', 'Run command', {cmd: cmd})
 				child = exec cmd, (error, stdout, stderr) ->
 					return callback(false) if error isnt null
 					return callback(true)
@@ -19,6 +19,7 @@ runas = (cmd, args, callback) ->
 				child = exec "which kdesu", (error, stdout, stderr) ->
 					if stdout
 						cmd = stdout.replace(/(\r\n|\n|\r)/gm,"") + " -d -c \"" + cmd + " " + args.join(" ") + "\""
+						Debug.info('runas', 'Run command', {cmd: cmd})
 						child = exec cmd, (error, stdout, stderr) ->
 							return callback(false) if error isnt null
 							return callback(true)
@@ -29,11 +30,13 @@ runas = (cmd, args, callback) ->
 
 	else if process.platform is "win32"
 		cmd = path.join(getInstallPathOpenVPN(), 'runas.cmd') + " " + cmd + " " + args.join(" ")
+		Debug.info('runas', 'Run command', {cmd: cmd})
 		child = exec cmd, (error, stdout, stderr) ->
 			return callback(false) if error isnt null
 			return callback(true)
 	else
 		cmd = "osascript -e 'do shell script \"" + cmd + " " + args.join(" ") + " \" with administrator privileges'"
+		Debug.info('runas', 'Run command', {cmd: cmd})
 		child = exec cmd, (error, stdout, stderr) ->
 			console.log(stdout)
 			return callback(false) if error isnt null

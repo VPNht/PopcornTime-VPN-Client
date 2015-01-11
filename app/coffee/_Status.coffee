@@ -14,37 +14,50 @@ getStatus = (callback) ->
 # d = disconnect monitoring
 checkStatus = (type) ->
     type = type || 'c'
-    console.log('monitoring status....', type)
-    getStatus (data) ->
-        if data
-            win.vpnStatus = data
-            console.log('connected', data.connected)
-            if window.connectionTimeout and type == 'c'
-                console.log('connection timeout, trying again')
-                window.connectionTimeout = false
-                clearTimeout window.timerMonitor if window.timerMonitor
-                window.App.VPN.disconnect().then () ->
-                    window.App.VPN.connect(window.App.VPN.protocol)
+    if type == 'c'
+        Debug.info('StatusMonitor', 'Checking connection')
+    else
+        Debug.info('StatusMonitor', 'Checking disconnection')
 
-            else if type == 'c' and data.connected == true
-                window.App.VPNClient.setVPNStatus(true)
-                clearTimeout window.timerMonitor if window.timerMonitor
-                Connected.open()
-            else if type == 'd' and data.connected == false
-                window.App.VPNClient.setVPNStatus(false)
-                Details.open()
-                clearTimeout window.timerMonitor if window.timerMonitor
+    getStatus (data) ->
+        if window.pendingCallback
+            if data
+                win.vpnStatus = data
+                Debug.info('StatusMonitor', 'Remote results', data)
+                if window.connectionTimeout and type == 'c'
+                    Debug.info('StatusMonitor', 'Connection timeout')
+                    window.connectionTimeout = false
+                    window.pendingCallback = false
+                    clearTimeout window.timerMonitor if window.timerMonitor
+                    window.App.VPN.disconnect().then () ->
+                        window.App.VPN.connect(window.App.VPN.protocol)
+
+                else if type == 'c' and data.connected == true
+                    window.pendingCallback = false
+                    window.App.VPNClient.setVPNStatus(true)
+                    clearTimeout window.timerMonitor if window.timerMonitor
+                    Connected.open()
+                else if type == 'd' and data.connected == false
+                    window.pendingCallback = false
+                    window.App.VPNClient.setVPNStatus(false)
+                    Details.open()
+                    clearTimeout window.timerMonitor if window.timerMonitor
+            else
+                # usefull when we got a route issue
+                if window.connectionTimeout
+                    Debug.info('StatusMonitor', 'Connection timeout or route issue')
+                    window.connectionTimeout = false
+                    window.pendingCallback = false
+                    clearTimeout window.timerMonitor if window.timerMonitor
+                    window.App.VPN.disconnect().then () ->
+                        window.App.VPN.connect(window.App.VPN.protocol)
+
         else
-            # usefull when we got a route issue
-            if window.connectionTimeout
-                console.log('connection timeout or route issue, trying again')
-                window.connectionTimeout = false
-                clearTimeout window.timerMonitor if window.timerMonitor
-                window.App.VPN.disconnect().then () ->
-                    window.App.VPN.connect(window.App.VPN.protocol)
+            Debug.info('StatusMonitor', 'Expired callback')
 
 monitorStatus = (type) ->
     clearTimeout window.timerMonitor if window.timerMonitor
+    window.pendingCallback = true
     window.timerMonitor = setInterval (->
         checkStatus(type)
     ), 2500

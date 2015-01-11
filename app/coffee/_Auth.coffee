@@ -29,6 +29,11 @@ class Auth
                             # we save our user info
                             window.vpn = JSON.parse(body)
 
+                            # bugsnag
+                            window.Bugsnag.user =
+                                id: username
+
                             # we show our details page
                             Details.open()
+                            window.pendingCallback = true
                             checkStatus()
