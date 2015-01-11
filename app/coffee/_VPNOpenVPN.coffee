@@ -46,12 +46,15 @@ VPN::installOpenVPN = ->
                         ]
                         # path to our install file
                         openvpnInstall = path.join(getInstallPathOpenVPN(), 'openvpn-install.exe')
+                        console.log('launching', openvpnInstall)
+                        console.log('args', args)
+
                         runas openvpnInstall, args, (success) ->
                             timerCheckDone = setInterval (->
                                 haveBin = haveBinariesOpenVPN()
                                 haveTap = haveBinariesTAP()
-                                console.log(haveBin)
-                                console.log(haveTap)
+                                console.log('haveBin', haveBin)
+                                console.log('haveTap', haveTap)
                                 if haveBin and haveTap
                                     # kill the timer to prevent looping
                                     window.clearTimeout(timerCheckDone)
