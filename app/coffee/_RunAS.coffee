@@ -70,7 +70,7 @@ spawnas = (cmd, args, callback) ->
 						return callback(false)
 
 	else if process.platform is "win32"
-		cmd = "\"" + path.join(getInstallPathOpenVPN(), 'runas.cmd') + "\" \"" + cmd + "\" " + args.join(" ")
+		cmd = "\"" + path.join(getInstallPathOpenVPN(), 'runas.cmd') + "\" " + cmd + " " + args.join(" ")
 		Debug.info('SpawnAS', 'Run command', {cmd: cmd})
 		child = exec(cmd,
 			detached: true
