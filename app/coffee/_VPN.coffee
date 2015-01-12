@@ -92,12 +92,12 @@ VPN::disconnect = () ->
 		# we try all !
 		getPidOpenVPN()
             .then (pid) ->
-                if pid != false
+				if pid != false
 					Debug.info('Client', 'Disconnecting OpenVPN')
 					monitorStatus('d')
-                    self.disconnectOpenVPN()
+					self.disconnectOpenVPN()
 
-            .catch (err) ->
+			.catch (err) ->
 				Debug.info('Client', 'Disconnecting PPTP')
 				monitorStatus('d')
-                self.disconnectPPTP()
+				self.disconnectPPTP()
