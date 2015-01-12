@@ -128,7 +128,7 @@ VPN::connectOpenVPN = ->
                 "127.0.0.1"
                 "1337"
                 "--config"
-                "'"+vpnConfig+"'"
+                '"'+vpnConfig+'"'
                 "--management-query-passwords"
                 "--management-hold"
                 "--script-security"
@@ -146,6 +146,8 @@ VPN::connectOpenVPN = ->
             # need to escape
             if process.platform == "darwin"
                 openvpn = '\\"'+openvpn+'\\"'
+            else
+                openvpn = '"'+openvpn+'"'
             else
                 openvpn = "'"+openvpn+"'"
 
