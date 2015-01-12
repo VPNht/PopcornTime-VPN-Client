@@ -21,7 +21,5 @@ class OpenVPNManagement
         client.on "data", (data) ->
             client.destroy()
             # return only the line #3 with his content
-            if process.platform == 'win32'
-                callback false, data.toString().split(/\r\n|\n|\r/)[0].toString()
-            else
-                callback false, data.toString().split(/\r\n|\n|\r/)[2].toString()
+            lines = data.toString().split(/\r\n|\n|\r/)
+            callback false, data.toString().split(/\r\n|\n|\r/)[lines.length-2]
