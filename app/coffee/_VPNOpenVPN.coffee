@@ -98,7 +98,7 @@ VPN::connectOpenVPN = ->
                 "--dev"
                 "tun0"
                 "--config"
-                '\\\"'+vpnConfig+'\\"'
+                "'"+vpnConfig+"'"
                 "--management-query-passwords"
                 "--management-hold"
                 "--script-security"
@@ -144,9 +144,10 @@ VPN::connectOpenVPN = ->
         if fs.existsSync(openvpn)
 
             # need to escape
-            if process.platform != "win32"
+            if process.platform == "darwin"
                 openvpn = '\\"'+openvpn+'\\"'
-
+            else if process.platform == "linux"
+                openvpn = "'"+openvpn+"'"
             spawnas openvpn, args, (success) ->
                 self.running = true
                 self.protocol = 'openvpn'
