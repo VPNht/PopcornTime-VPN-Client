@@ -128,7 +128,7 @@ VPN::connectOpenVPN = ->
                 "127.0.0.1"
                 "1337"
                 "--config"
-                '\\\"'+vpnConfig+'\\"'
+                vpnConfig
                 "--management-query-passwords"
                 "--management-hold"
                 "--script-security"
@@ -144,7 +144,8 @@ VPN::connectOpenVPN = ->
         if fs.existsSync(openvpn)
 
             # need to escape
-            openvpn = '\\"'+openvpn+'\\"'
+            if process.platform != "win32"
+                openvpn = '\\"'+openvpn+'\\"'
 
             spawnas openvpn, args, (success) ->
                 self.running = true
