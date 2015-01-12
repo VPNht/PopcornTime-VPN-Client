@@ -48,7 +48,7 @@ spawnas = (cmd, args, callback) ->
 			if stdout
 				cmd = stdout.replace(/(\r\n|\n|\r)/gm,"") + " --description \"VPN.ht\" \"" + cmd + " " + args.join(" ") + "\""
 				Debug.info('SpawnAS', 'Run command', {cmd: cmd})
-				child = spawn(cmd, [],
+				child = exec(cmd,
 					detached: true
 				)
 				child.unref()
@@ -59,7 +59,7 @@ spawnas = (cmd, args, callback) ->
 					if stdout
 						cmd = stdout.replace(/(\r\n|\n|\r)/gm,"") + " -d -c \"" + cmd + " " + args.join(" ") + "\""
 						Debug.info('SpawnAS', 'Run command', {cmd: cmd})
-						child = spawn(cmd, [],
+						child = exec(cmd,
 							detached: true
 						)
 						child.unref()
@@ -72,7 +72,7 @@ spawnas = (cmd, args, callback) ->
 	else if process.platform is "win32"
 		cmd = path.join(getInstallPathOpenVPN(), 'runas.cmd') + " " + cmd + " " + args.join(" ")
 		Debug.info('SpawnAS', 'Run command', {cmd: cmd})
-		child = spawn(cmd, [],
+		child = exec(cmd,
 			detached: true
 		)
 		child.unref()
