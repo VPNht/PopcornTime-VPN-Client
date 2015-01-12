@@ -11,7 +11,7 @@ class Details
         if process.platform is "darwin"
             protocols = ['openvpn']
         else if process.platform is "win32"
-            protocols = ['pptp', 'openvpn']
+            protocols = ['openvpn', 'pptp']
         else if process.platform is "linux"
             protocols = ['openvpn']
 
