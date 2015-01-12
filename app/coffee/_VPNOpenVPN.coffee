@@ -201,7 +201,7 @@ haveBinariesTAP = ->
 	switch process.platform
 		when "win32"
             # looks for tap exe
-			return fs.existsSync(path.resolve(process.env.ProgramW6432, "TAP-Windows", "bin", "tapinstall.exe"))
+			return fs.existsSync(path.resolve(process.env.ProgramW6432 || process.env.ProgramFiles, "TAP-Windows", "bin", "tapinstall.exe"))
 		else
 			return false
 
