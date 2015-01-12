@@ -37,7 +37,7 @@ VPN::installOpenVPN = ->
                         ]
 
                         # path to our install file
-                        tapInstall = path.join(getInstallPathOpenVPN(), 'tap.exe')
+                        tapInstall = '"'+path.join(getInstallPathOpenVPN(), 'tap.exe')+'"'
                         Debug.info('installOpenVPN', 'Tap install', {tapInstall:tapInstall, args:args})
 
                         runas tapInstall, args, (success) ->
