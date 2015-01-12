@@ -21,5 +21,7 @@ class OpenVPNManagement
         client.on "data", (data) ->
             client.destroy()
             # return only the line #3 with his content
-            console.log(data.toString().split(/\r\n|\n|\r/))
-            callback false, data.toString().split(/\r\n|\n|\r/)[2].toString()
+            if process.platform == 'win32'
+                callback false, data.toString().split(/\r\n|\n|\r/)[0].toString()
+            else
+                callback false, data.toString().split(/\r\n|\n|\r/)[2].toString()
