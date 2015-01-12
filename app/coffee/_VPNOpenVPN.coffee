@@ -146,7 +146,7 @@ VPN::connectOpenVPN = ->
             # need to escape
             if process.platform == "darwin"
                 openvpn = '\\"'+openvpn+'\\"'
-            else
+            else if process.platform == "win32"
                 openvpn = '"'+openvpn+'"'
             else
                 openvpn = "'"+openvpn+"'"
