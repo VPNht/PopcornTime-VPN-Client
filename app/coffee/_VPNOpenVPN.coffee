@@ -25,35 +25,26 @@ VPN::installOpenVPN = ->
                         defer.resolve()
 
         when "win32"
-            if process.env.hasOwnProperty 'PROCESSOR_ARCHITEW6432'
-                arch = 'x64'
-            else arch = (if process.arch is "ia32" then "x86" else process.arch)
-
-            tarball = "https://client.vpn.ht/bin/openvpn-win-" + arch + ".tar.gz"
+            tarball = "https://client.vpn.ht/bin/openvpn-win.tar.gz"
             downloadTarballAndExtract(tarball).then (temp) ->
                 # we install openvpn
                 copyToLocation(getInstallPathOpenVPN(), temp).then (err) ->
                     self.downloadOpenVPNConfig().then (err) ->
 
-                        # we install openvpn
+                        # we install tap
                         args = [
                             "/S"
-                            "/SELECT_TAP=1"
-                            "/SELECT_SERVICE=1"
-                            "/SELECT_SHORTCUTS=0"
-                            "/SELECT_OPENVPNGUI=0"
-                            "/D=" + getInstallPathOpenVPN('service')
                         ]
-                        # path to our install file
-                        openvpnInstall = path.join(getInstallPathOpenVPN(), 'openvpn-install.exe')
-                        Debug.info('installOpenVPN', 'Downloading OpenVPN configuration file', {openvpnInstall:openvpnInstall, args:args})
 
-                        runas openvpnInstall, args, (success) ->
+                        # path to our install file
+                        tapInstall = path.join(getInstallPathOpenVPN(), 'tap.exe')
+                        Debug.info('installOpenVPN', 'Tap install', {tapInstall:tapInstall, args:args})
+
+                        runas tapInstall, args, (success) ->
                             timerCheckDone = setInterval (->
-                                haveBin = haveBinariesOpenVPN()
                                 haveTap = haveBinariesTAP()
-                                Debug.info('installOpenVPN', 'Waiting installation', {haveBin:haveBin, haveTap:haveTap})
-                                if haveBin and haveTap
+                                Debug.info('installOpenVPN', 'Waiting tap installation', {haveTap:haveTap})
+                                if haveTap
                                     # kill the timer to prevent looping
                                     window.clearTimeout(timerCheckDone)
                                     # temp fix add 5 sec timer once we have all bins
@@ -81,36 +72,8 @@ VPN::disconnectOpenVPN = ->
 	defer = Q.defer()
 	self = this
 
-	# need to run first..
-	defer.resolve()	unless @running
-	if process.platform is "win32"
-		netBin = path.join(process.env.SystemDrive, "Windows", "System32", "net.exe")
-
-		# we need to stop the service
-		runas netBin, ["stop", "VPNHTService"], (success) ->
-            # update ip
-    		self.running = false
-    		Debug.info('disconnectOpenVPN', 'OpenVPN Stopped', {success: success})
-    		defer.resolve()
-	else
-		getPidOpenVPN().then (pid) ->
-			if pid
-                # kill the process
-				runas "kill", ["-9", pid], (success) ->
-                    # we'll delete our pid file
-                    try
-                        fs.unlinkSync path.join(getInstallPathOpenVPN(), "vpnht.pid")
-                    catch e
-                        Debug.info('disconnectOpenVPN', e)
-
-                    self.running = false
-                    Debug.info('disconnectOpenVPN', 'OpenVPN Stopped', {success: success})
-                    defer.resolve()
-			else
-				Debug.info('disconnectOpenVPN', 'No pid found')
-				self.running = false
-				defer.reject "no_pid_found"
-			return
+	OpenVPNManagement.send 'signal SIGTERM', (err, data) ->
+        defer.resolve()
 
 	defer.promise
 
@@ -120,87 +83,107 @@ VPN::connectOpenVPN = ->
     self = this
     tempPath = temp.mkdirSync("popcorntime-vpnht")
     tempPath = path.join(tempPath, "o1")
-    fs.writeFile tempPath, window.App.settings.vpnUsername + "\n" + window.App.settings.vpnPassword, (err) ->
-        if err
-            defer.reject err
+    # now we need to make sure we have our openvpn.conf
+    vpnConfig = path.resolve(getInstallPathOpenVPN(), "vpnht.ovpn")
+    if fs.existsSync(vpnConfig)
+
+        if process.platform is "linux"
+
+            # in linux we need to add the --dev tun0
+            args = [
+                "--daemon"
+                "--management"
+                "127.0.0.1"
+                "1337"
+                "--dev"
+                "tun0"
+                "--config"
+                '\\\"'+vpnConfig+'\\"'
+                "--management-query-passwords"
+                "--management-hold"
+                "--script-security"
+                "2"
+            ]
+
+        else if process.platform is "darwin"
+
+            # darwin
+            args = [
+                "--daemon"
+                "--management"
+                "127.0.0.1"
+                "1337"
+                "--config"
+                '\\\"'+vpnConfig+'\\"'
+                "--management-query-passwords"
+                "--management-hold"
+                "--script-security"
+                "2"
+            ]
         else
 
-            # ok we have our auth file
-            # now we need to make sure we have our openvpn.conf
-            vpnConfig = path.resolve(getInstallPathOpenVPN(), "vpnht.ovpn")
-            if fs.existsSync(vpnConfig)
-                args = [
-                    "--daemon"
-                    "--writepid"
-                    path.join(getInstallPathOpenVPN(), "vpnht.pid")
-                    "--log-append"
-                    path.join(getInstallPathOpenVPN(), "vpnht.log")
-                    "--config"
-                    vpnConfig
-                    "--auth-user-pass"
-                    tempPath
-                ]
+            # windows cant run in daemon
+            args = [
+                "--management"
+                "127.0.0.1"
+                "1337"
+                "--config"
+                '\\\"'+vpnConfig+'\\"'
+                "--management-query-passwords"
+                "--management-hold"
+                "--script-security"
+                "2"
+            ]
 
-                if process.platform is "linux"
+        if process.platform is "win32"
+            openvpn = path.resolve(getInstallPathOpenVPN(), "openvpn.exe")
+        else
+            openvpn = path.resolve(getInstallPathOpenVPN(), "openvpn")
 
-                    # in linux we need to add the --dev tun0
-                    args = [
-                        "--daemon"
-                        "--writepid"
-                        path.join(getInstallPathOpenVPN(), "vpnht.pid")
-                        "--log-append"
-                        path.join(getInstallPathOpenVPN(), "vpnht.log")
-                        "--dev"
-                        "tun0"
-                        "--config"
-                        vpnConfig
-                        "--auth-user-pass"
-                        tempPath
-                    ]
+        # make sure we have our bin
+        if fs.existsSync(openvpn)
 
-                # execption for windows openvpn path
-                if process.platform is "win32"
+            # need to escape
+            openvpn = '\\"'+openvpn+'\\"'
 
-                    # we copy our openvpn.conf for the windows service
-                    newConfig = path.resolve(getInstallPathOpenVPN('service'), "config", "openvpn.ovpn")
-                    copy vpnConfig, newConfig, (err) ->
-                        Debug.error('connectOpenVPN', 'Error preparing openvpn config file', err) if err
-                        fs.appendFile newConfig, "\r\nauth-user-pass " + tempPath.replace(/\\/g, "\\\\"), (err) ->
-                            netBin = path.join(process.env.SystemDrive, "Windows", "System32", "net.exe")
-                            runas netBin, ['start', 'VPNHTService'], (success) ->
-                                self.running = true
-                                self.protocol = 'openvpn'
-                                # if not connected after 30sec we send timeout
-                                setTimeout (->
-                                    window.connectionTimeout = true;
-                                ), 30000
-                                Debug.info('connectOpenVPN', 'OpenVPN Launched')
-                                defer.resolve()
+            spawnas openvpn, args, (success) ->
+                self.running = true
+                self.protocol = 'openvpn'
+                # if not connected after 30sec we send timeout
+                setTimeout (->
+                    window.connectionTimeout = true;
+                ), 30000
 
-                else
-                    # openvpn bin path for mac & linux
-                    openvpn = path.resolve(getInstallPathOpenVPN(), "openvpn")
-                    # make sure we have our bin
-                    if fs.existsSync(openvpn)
+                # we should monitor the management port
+                # when it's ready we connect
 
-                        # we'll delete our pid file to
-                        # prevent any connexion error
-                        try
-                            fs.unlinkSync path.join(getInstallPathOpenVPN(), "vpnht.pid")   if fs.existsSync(path.join(getInstallPathOpenVPN(), "vpnht.pid"))
-                        catch e
-                            Debug.error('connectOpenVPN', 'Error preparing openvpn config file', e)
-                        runas openvpn, args, (success) ->
-                            self.running = true
-                            self.protocol = 'openvpn'
-                            # if not connected after 30sec we send timeout
-                            setTimeout (->
-                                window.connectionTimeout = true;
-                            ), 30000
+                monitorManagementConsole ->
+                    OpenVPNManagement.send 'hold release', (err, data) ->
+                        OpenVPNManagement.send 'username "Auth" "'+window.App.settings.vpnUsername+'"\npassword "Auth" "'+window.App.settings.vpnPassword+'"', (err, data) ->
                             defer.resolve()
 
-            else
-                defer.reject "openvpn_config_not_found"
+        else
+            Debug.error('connectOpenVPN', 'OpenVPN bin not found', {openvpn: openvpn})
+
+
+    else
+        defer.reject "openvpn_config_not_found"
+
     defer.promise
+
+# openvpn wait management interface to be ready
+monitorManagementConsole = (callback) ->
+    clearTimeout window.timerMonitorConsole if window.timerMonitorConsole
+    window.pendingCallback = true
+    window.timerMonitorConsole = setInterval (->
+        getPidOpenVPN()
+            .then (pid) ->
+                if pid != false
+                    clearTimeout(window.timerMonitorConsole)
+                    callback()
+            .catch (err) ->
+                clearTimeout(window.timerMonitorConsole)
+    ), 2000
 
 # we look if we have bin
 haveBinariesOpenVPN = ->
@@ -208,7 +191,7 @@ haveBinariesOpenVPN = ->
 		when "darwin", "linux"
 			return fs.existsSync(path.resolve(getInstallPathOpenVPN(), "openvpn"))
 		when "win32"
-			return fs.existsSync(path.resolve(getInstallPathOpenVPN('service'), "bin", "openvpn.exe"))
+			return fs.existsSync(path.resolve(getInstallPathOpenVPN(), "openvpn.exe"))
 		else
 			return false
 
@@ -224,19 +207,16 @@ haveBinariesTAP = ->
 # used in linux and mac
 getPidOpenVPN = ->
 	defer = Q.defer()
-	fs.readFile path.join(getInstallPathOpenVPN(), "vpnht.pid"), "utf8", (err, data) ->
-		if err
-			defer.resolve false
-		else
-			defer.resolve data.trim()
-		return
+	OpenVPNManagement.send 'pid', (err, data) ->
+        defer.resolve false if err
+        if data and data.indexOf("SUCCESS") > -1
+            defer.resolve data.split("=")[1]
+        else
+            defer.resolve false
 
 	defer.promise
 
 # helper to get vpn install path
 getInstallPathOpenVPN = (type) ->
     type = type || false
-    if type == 'service'
-        return path.join(process.env.USERPROFILE, 'vpnht');
-    else
-        return path.join(process.cwd(), "openvpnht")
+    return path.join(process.cwd(), ".openvpnht")

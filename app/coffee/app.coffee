@@ -1,6 +1,7 @@
 _ = require('underscore')
 request = require('request')
 exec = require("child_process").exec
+spawn = require("child_process").spawn
 Q = require("q")
 tar = require("tar")
 temp = require("temp")
@@ -11,10 +12,12 @@ path = require("path")
 gui = require('nw.gui')
 win = gui.Window.get()
 timerMonitor = false
+timerMonitorConsole = false
 connectionTimeout = false
 pendingCallback = false
+openvpnSocket = false
 
-version = '0.1.0'
+version = '0.1.0-2'
 win.title = gui.App.manifest.name + ' VPN ' + version
 
 win.focus()
