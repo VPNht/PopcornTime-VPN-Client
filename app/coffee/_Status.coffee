@@ -34,6 +34,7 @@ checkStatus = (type) ->
                         window.pendingCallback = false
                         window.connected = false
                         clearTimeout window.timerMonitor if window.timerMonitor
+                        clearTimeout window.connectionTimeoutTimer if window.connectionTimeoutTimer
                         window.App.VPN.disconnect().then () ->
                             window.App.VPN.connect(window.App.VPN.protocol)
 
@@ -43,6 +44,7 @@ checkStatus = (type) ->
                         window.connected = true
                         window.App.VPNClient.setVPNStatus(true)
                         clearTimeout window.timerMonitor if window.timerMonitor
+                        clearTimeout window.connectionTimeoutTimer if window.connectionTimeoutTimer
                         Connected.open()
                     else if type == 'd' and data.connected == false
                         window.connectionTimeout = false
@@ -51,6 +53,7 @@ checkStatus = (type) ->
                         window.App.VPNClient.setVPNStatus(false)
                         Details.open()
                         clearTimeout window.timerMonitor if window.timerMonitor
+                        clearTimeout window.connectionTimeoutTimer if window.connectionTimeoutTimer
                 else
                     # usefull when we got a route issue
                     if window.connectionTimeout and !window.connected
@@ -59,6 +62,7 @@ checkStatus = (type) ->
                         window.pendingCallback = false
                         window.connected = false
                         clearTimeout window.timerMonitor if window.timerMonitor
+                        clearTimeout window.connectionTimeoutTimer if window.connectionTimeoutTimer
                         window.App.VPN.disconnect().then () ->
                             window.App.VPN.connect(window.App.VPN.protocol)
 

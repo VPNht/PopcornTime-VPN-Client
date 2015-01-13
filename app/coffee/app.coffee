@@ -12,13 +12,14 @@ path = require("path")
 gui = require('nw.gui')
 win = gui.Window.get()
 timerMonitor = false
+connectionTimeoutTimer = false
 timerMonitorConsole = false
 connectionTimeout = false
 pendingCallback = false
 openvpnSocket = false
 connected = false
 
-version = '0.1.0-2'
+version = '0.1.0-3'
 win.title = gui.App.manifest.name + ' VPN ' + version
 
 win.focus()

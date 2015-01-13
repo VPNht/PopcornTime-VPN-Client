@@ -155,7 +155,7 @@ VPN::connectOpenVPN = ->
                 self.running = true
                 self.protocol = 'openvpn'
                 # if not connected after 30sec we send timeout
-                setTimeout (->
+                window.connectionTimeoutTimer = setTimeout (->
                     window.connectionTimeout = true;
                 ), 30000
 
