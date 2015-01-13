@@ -16,6 +16,7 @@ timerMonitorConsole = false
 connectionTimeout = false
 pendingCallback = false
 openvpnSocket = false
+connected = false
 
 version = '0.1.0-2'
 win.title = gui.App.manifest.name + ' VPN ' + version

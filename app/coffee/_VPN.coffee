@@ -39,11 +39,10 @@ VPN::isRunning = () ->
 
 VPN::connect = (protocol) ->
 	hideAll()
-	self = this
-	window.connectionTimeout = false
 	$('.connecting').show()
 
-	monitorStatus()
+	self = this
+	window.connectionTimeout = false
 	window.Bugsnag.metaData = vpn:
 		protocol: protocol
 
@@ -54,39 +53,45 @@ VPN::connect = (protocol) ->
 		pptpEnabled = window.App.advsettings.get("vpnPPTP")
 		if pptpEnabled
 			Debug.info('Client', 'Connecting PPTP')
-			return @connectPPTP()
+			return @connectPPTP().then () ->
+				monitorStatus()
 		else
 			Debug.info('Client', 'Installing PPTP')
 			@installPPTP().then () ->
 				Debug.info('Client', 'Connecting PPTP')
-				self.connectPPTP()
+				self.connectPPTP().then () ->
+					monitorStatus()
 	else
 
 		# we look if we have openvpn installed
 		ovpnEnabled = window.App.advsettings.get("vpnOVPN")
 		if ovpnEnabled and haveBinariesOpenVPN()
 			Debug.info('Client', 'Connecting OpenVPN')
-			return @connectOpenVPN()
+			return @connectOpenVPN().then () ->
+				monitorStatus()
 		else
 			Debug.info('Client', 'Installing OpenVPN')
 			@installOpenVPN().then () ->
 				Debug.info('Client', 'Connecting OpenVPN')
-				self.connectOpenVPN()
+				self.connectOpenVPN().then () ->
+					monitorStatus()
 
 VPN::disconnect = () ->
 	hideAll()
 	$('.loading').show()
 
 	self = this
+	window.pendingCallback = false
+
 	if @running and @protocol == 'pptp'
-		monitorStatus('d')
 		Debug.info('Client', 'Disconnecting PPTP')
-		return self.disconnectPPTP()
+		return self.disconnectPPTP().then () ->
+			monitorStatus('d')
 
 	else if @running and @protocol == 'openvpn'
-		monitorStatus('d')
 		Debug.info('Client', 'Disconnecting OpenVPN')
-		return self.disconnectOpenVPN()
+		return self.disconnectOpenVPN().then () ->
+			monitorStatus('d')
 
 	else
 		# we try all !
@@ -94,14 +99,14 @@ VPN::disconnect = () ->
             .then (pid) ->
 				if pid
 					Debug.info('Client', 'Disconnecting OpenVPN')
-					monitorStatus('d')
-					self.disconnectOpenVPN()
+					self.disconnectOpenVPN().then () ->
+						monitorStatus('d')
 				else
 					Debug.info('Client', 'Disconnecting PPTP')
-					monitorStatus('d')
-					self.disconnectPPTP()
+					self.disconnectPPTP().then () ->
+						monitorStatus('d')
 
 			.catch (err) ->
 				Debug.info('Client', 'Disconnecting PPTP')
-				monitorStatus('d')
-				self.disconnectPPTP()
+				self.disconnectPPTP().then () ->
+					monitorStatus('d')

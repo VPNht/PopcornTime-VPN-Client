@@ -1,6 +1,9 @@
 class Auth
 
     @logout = ->
+        window.connectionTimeout = false
+        window.pendingCallback = false
+        window.connected = false
         window.App.advsettings.set('vpnUsername', '')
         window.App.advsettings.set('vpnPassword', '')
         hideAll()

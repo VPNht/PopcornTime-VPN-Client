@@ -19,41 +19,50 @@ checkStatus = (type) ->
     else
         Debug.info('StatusMonitor', 'Checking disconnection')
 
-    getStatus (data) ->
-        if window.pendingCallback
-            if data
-                win.vpnStatus = data
-                Debug.info('StatusMonitor', 'Remote results', data)
-                if window.connectionTimeout and type == 'c'
-                    Debug.info('StatusMonitor', 'Connection timeout')
-                    window.connectionTimeout = false
-                    window.pendingCallback = false
-                    clearTimeout window.timerMonitor if window.timerMonitor
-                    window.App.VPN.disconnect().then () ->
-                        window.App.VPN.connect(window.App.VPN.protocol)
+    if window.connected and type == 'c'
+        clearTimeout window.timerMonitor
+    else
+        getStatus (data) ->
+            if window.pendingCallback
+                if data
+                    win.vpnStatus = data
+                    Debug.info('StatusMonitor', 'Remote results', data)
+                    if window.connectionTimeout and type == 'c' and !window.connected
+                        Debug.info('StatusMonitor', 'Connection timeout')
+                        window.connectionTimeout = false
+                        window.pendingCallback = false
+                        window.connected = false
+                        clearTimeout window.timerMonitor if window.timerMonitor
+                        window.App.VPN.disconnect().then () ->
+                            window.App.VPN.connect(window.App.VPN.protocol)
 
-                else if type == 'c' and data.connected == true
-                    window.pendingCallback = false
-                    window.App.VPNClient.setVPNStatus(true)
-                    clearTimeout window.timerMonitor if window.timerMonitor
-                    Connected.open()
-                else if type == 'd' and data.connected == false
-                    window.pendingCallback = false
-                    window.App.VPNClient.setVPNStatus(false)
-                    Details.open()
-                    clearTimeout window.timerMonitor if window.timerMonitor
+                    else if type == 'c' and data.connected == true
+                        window.connectionTimeout = false
+                        window.pendingCallback = false
+                        window.connected = true
+                        window.App.VPNClient.setVPNStatus(true)
+                        clearTimeout window.timerMonitor if window.timerMonitor
+                        Connected.open()
+                    else if type == 'd' and data.connected == false
+                        window.connectionTimeout = false
+                        window.pendingCallback = false
+                        window.connected = false
+                        window.App.VPNClient.setVPNStatus(false)
+                        Details.open()
+                        clearTimeout window.timerMonitor if window.timerMonitor
+                else
+                    # usefull when we got a route issue
+                    if window.connectionTimeout and !window.connected
+                        Debug.info('StatusMonitor', 'Connection timeout or route issue')
+                        window.connectionTimeout = false
+                        window.pendingCallback = false
+                        window.connected = false
+                        clearTimeout window.timerMonitor if window.timerMonitor
+                        window.App.VPN.disconnect().then () ->
+                            window.App.VPN.connect(window.App.VPN.protocol)
+
             else
-                # usefull when we got a route issue
-                if window.connectionTimeout
-                    Debug.info('StatusMonitor', 'Connection timeout or route issue')
-                    window.connectionTimeout = false
-                    window.pendingCallback = false
-                    clearTimeout window.timerMonitor if window.timerMonitor
-                    window.App.VPN.disconnect().then () ->
-                        window.App.VPN.connect(window.App.VPN.protocol)
-
-        else
-            Debug.info('StatusMonitor', 'Expired callback')
+                Debug.info('StatusMonitor', 'Expired callback')
 
 monitorStatus = (type) ->
     clearTimeout window.timerMonitor if window.timerMonitor
