@@ -82,6 +82,8 @@ VPN::disconnect = () ->
 
 	self = this
 	window.pendingCallback = false
+	clearTimeout window.timerMonitorConsole if window.timerMonitorConsole
+	clearTimeout window.timerMonitor if window.timerMonitor
 
 	if @running and @protocol == 'pptp'
 		Debug.info('Client', 'Disconnecting PPTP')
