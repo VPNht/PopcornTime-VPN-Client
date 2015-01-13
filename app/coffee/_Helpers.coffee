@@ -7,7 +7,7 @@ hideAll = ->
     $('.loading').hide()
 
 autoLogin = ->
-    Debug.info('autoLogin', window.App.settings.vpnUsername)
+    Debug.info('autoLogin', 'Initializing autologin', {username: window.App.settings.vpnUsername})
     # we check if we have existing login and we auto login
     if window.App and window.App.settings.vpnUsername and window.App.settings.vpnPassword
         $('#username').val(window.App.settings.vpnUsername)

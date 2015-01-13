@@ -140,6 +140,8 @@ VPN::connectOpenVPN = ->
         else
             openvpn = path.resolve(getInstallPathOpenVPN(), "openvpn")
 
+        Debug.info('connectOpenVPN', 'OpenVPN', {bin: openvpn, args: args})
+
         # make sure we have our bin
         if fs.existsSync(openvpn)
 
@@ -154,36 +156,44 @@ VPN::connectOpenVPN = ->
             spawnas openvpn, args, (success) ->
                 self.running = true
                 self.protocol = 'openvpn'
-                # if not connected after 30sec we send timeout
-                window.connectionTimeoutTimer = setTimeout (->
-                    window.connectionTimeout = true;
-                ), 30000
 
                 # we should monitor the management port
                 # when it's ready we connect
 
                 monitorManagementConsole ->
+                    Debug.info('connectOpenVPN', 'Hold release')
                     OpenVPNManagement.send 'hold release', (err, data) ->
+                        Debug.info('connectOpenVPN', 'Sending authentification')
                         OpenVPNManagement.send 'username "Auth" "'+window.App.settings.vpnUsername+'"\npassword "Auth" "'+window.App.settings.vpnPassword+'"', (err, data) ->
+                            # if not connected after 30sec we send timeout
+                            Debug.info('connectOpenVPN', 'Authentification sent')
+                            clearTimeout window.connectionTimeoutTimer if window.connectionTimeoutTimer
+                            window.connectionTimeoutTimer = setTimeout (->
+                                window.connectionTimeout = true;
+                            ), 30000
                             defer.resolve()
 
         else
             Debug.error('connectOpenVPN', 'OpenVPN bin not found', {openvpn: openvpn})
+            defer.reject "openvpn_bin_not_found"
 
 
     else
+        Debug.error('connectOpenVPN', 'OpenVPN config not found', {vpnConfig: vpnConfig})
         defer.reject "openvpn_config_not_found"
 
     defer.promise
 
 # openvpn wait management interface to be ready
 monitorManagementConsole = (callback) ->
+    Debug.info('monitorManagementConsole', 'Waiting OpenVPN monitor interface to be ready on port 1337')
     clearTimeout window.timerMonitorConsole if window.timerMonitorConsole
     window.pendingCallback = true
     window.timerMonitorConsole = setInterval (->
         getPidOpenVPN()
             .then (pid) ->
                 if pid != false
+                    Debug.info('monitorManagementConsole', 'Interface ready')
                     clearTimeout(window.timerMonitorConsole)
                     callback()
             .catch (err) ->
@@ -194,17 +204,22 @@ monitorManagementConsole = (callback) ->
 haveBinariesOpenVPN = ->
 	switch process.platform
 		when "darwin", "linux"
-			return fs.existsSync(path.resolve(getInstallPathOpenVPN(), "openvpn"))
+            bin = path.resolve(getInstallPathOpenVPN(), "openvpn")
+            Debug.info('haveBinariesOpenVPN', 'Checking OpenVPN binaries', {bin: bin})
+            return fs.existsSync(bin)
 		when "win32"
-			return fs.existsSync(path.resolve(getInstallPathOpenVPN(), "openvpn.exe"))
+            bin = path.resolve(getInstallPathOpenVPN(), "openvpn.exe")
+            Debug.info('haveBinariesOpenVPN', 'Checking OpenVPN binaries', {bin: bin})
+            return fs.existsSync(bin)
 		else
 			return false
 
 haveBinariesTAP = ->
 	switch process.platform
 		when "win32"
-            # looks for tap exe
-			return fs.existsSync(path.resolve(process.env.ProgramW6432 || process.env.ProgramFiles, "TAP-Windows", "bin", "devcon.exe"))
+            bin = path.resolve(process.env.ProgramW6432 || process.env.ProgramFiles, "TAP-Windows", "bin", "devcon.exe")
+            Debug.info('haveBinariesTAP', 'Checking TAP binaries', {bin: bin})
+            return fs.existsSync(bin)
 		else
 			return false
 
@@ -213,10 +228,16 @@ haveBinariesTAP = ->
 getPidOpenVPN = ->
 	defer = Q.defer()
 	OpenVPNManagement.send 'pid', (err, data) ->
-        defer.resolve false if err
-        if data and data.indexOf("SUCCESS") > -1
+        if err
+            Debug.error('getPidOpenVPN', 'Validate OpenVPN Process', {err: err, data: data})
+            defer.resolve false
+
+        else if data and data.indexOf("SUCCESS") > -1
+            Debug.info('getPidOpenVPN', 'Validate OpenVPN Process', {data: data})
             defer.resolve data.split("=")[1]
+
         else
+            Debug.info('getPidOpenVPN', 'Validate OpenVPN Process', {data: data})
             defer.resolve false
 
 	defer.promise
@@ -224,4 +245,6 @@ getPidOpenVPN = ->
 # helper to get vpn install path
 getInstallPathOpenVPN = (type) ->
     type = type || false
-    return path.join(process.cwd(), ".openvpnht")
+    binpath = path.join(process.cwd(), ".openvpnht")
+    Debug.info('getInstallPathOpenVPN', 'Get OpenVPN path', {path: binpath})
+    return binpath
