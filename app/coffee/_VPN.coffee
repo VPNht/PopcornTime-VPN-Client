@@ -90,12 +90,12 @@ VPN::disconnect = () ->
 	if @running and @protocol == 'pptp'
 		Debug.info('Client', 'Disconnecting PPTP')
 		return self.disconnectPPTP().then () ->
-			monitorStatus('d')
+			disconnectUser()
 
 	else if @running and @protocol == 'openvpn'
 		Debug.info('Client', 'Disconnecting OpenVPN')
 		return self.disconnectOpenVPN().then () ->
-			monitorStatus('d')
+			disconnectUser()
 
 	else
 		# we try all !
@@ -104,13 +104,13 @@ VPN::disconnect = () ->
 				if pid
 					Debug.info('Client', 'Disconnecting OpenVPN')
 					self.disconnectOpenVPN().then () ->
-						monitorStatus('d')
+						disconnectUser()
 				else
 					Debug.info('Client', 'Disconnecting PPTP')
 					self.disconnectPPTP().then () ->
-						monitorStatus('d')
+						disconnectUser()
 
 			.catch (err) ->
 				Debug.info('Client', 'Disconnecting PPTP')
 				self.disconnectPPTP().then () ->
-					monitorStatus('d')
+					disconnectUser()

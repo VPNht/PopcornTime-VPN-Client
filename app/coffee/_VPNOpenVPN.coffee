@@ -161,18 +161,23 @@ VPN::connectOpenVPN = ->
                 # when it's ready we connect
 
                 monitorManagementConsole ->
-                    Debug.info('connectOpenVPN', 'Hold release')
-                    OpenVPNManagement.send 'hold release', (err, data) ->
-                        Debug.info('connectOpenVPN', 'Sending authentification')
-                        OpenVPNManagement.send 'username "Auth" "'+window.App.settings.vpnUsername+'"\npassword "Auth" "'+window.App.settings.vpnPassword+'"', (err, data) ->
-                            # if not connected after 30sec we send timeout
-                            Debug.info('connectOpenVPN', 'Authentification sent')
-                            clearTimeout window.connectionTimeoutTimer if window.connectionTimeoutTimer
-                            window.connectionTimeoutTimer = setTimeout (->
-                                window.connectionTimeout = true;
-                            ), 30000
-                            defer.resolve()
-
+                    # wait 2s
+                    setTimeout (->
+                        Debug.info('connectOpenVPN', 'Hold release')
+                        OpenVPNManagement.send 'hold release', (err, data) ->
+                            # wait 2s
+                            setTimeout (->
+                                Debug.info('connectOpenVPN', 'Sending authentification')
+                                OpenVPNManagement.send 'username "Auth" "'+window.App.settings.vpnUsername+'"\npassword "Auth" "'+window.App.settings.vpnPassword+'"', (err, data) ->
+                                    # if not connected after 30sec we send timeout
+                                    Debug.info('connectOpenVPN', 'Authentification sent')
+                                    clearTimeout window.connectionTimeoutTimer if window.connectionTimeoutTimer
+                                    window.connectionTimeoutTimer = setTimeout (->
+                                        window.connectionTimeout = true;
+                                    ), 30000
+                                    defer.resolve()
+                            ), 2000
+                    ), 2000
         else
             Debug.error('connectOpenVPN', 'OpenVPN bin not found', {openvpn: openvpn})
             defer.reject "openvpn_bin_not_found"

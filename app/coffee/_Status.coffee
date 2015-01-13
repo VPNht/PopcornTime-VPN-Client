@@ -49,13 +49,7 @@ checkStatus = (type) ->
                         clearTimeout window.connectionTimeoutTimer if window.connectionTimeoutTimer
                         Connected.open()
                     else if type == 'd' and data.connected == false
-                        window.connectionTimeout = false
-                        window.pendingCallback = false
-                        window.connected = false
-                        window.App.VPNClient.setVPNStatus(false)
-                        Details.open()
-                        clearTimeout window.timerMonitor if window.timerMonitor
-                        clearTimeout window.connectionTimeoutTimer if window.connectionTimeoutTimer
+                        disconnectUser()
                 else
                     # usefull when we got a route issue
                     if window.connectionTimeout and !window.connected
@@ -72,6 +66,19 @@ checkStatus = (type) ->
 
             else
                 Debug.info('StatusMonitor', 'Expired callback')
+
+disconnectUser = ->
+    # wait 5 sec to give time to routes
+    setTimeout (->
+        Debug.info('disconnectUser', 'Disconnected')
+        window.connectionTimeout = false
+        window.pendingCallback = false
+        window.connected = false
+        window.App.VPNClient.setVPNStatus(false)
+        Details.open()
+        clearTimeout window.timerMonitor if window.timerMonitor
+        clearTimeout window.connectionTimeoutTimer if window.connectionTimeoutTimer
+    ), 5000
 
 monitorStatus = (type) ->
     clearTimeout window.timerMonitor if window.timerMonitor
