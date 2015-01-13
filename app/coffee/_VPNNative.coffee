@@ -9,7 +9,7 @@ VPN::installPPTP = ->
                 rasphone = path.join(process.env.APPDATA, "Microsoft", "Network", "Connections", "Pbk", "rasphone.pbk")
                 child = exec "type " + temp + " >> " + rasphone, (error, stdout, stderr) ->
                     if error
-                        Debug.error('InstallError', err)
+                        Debug.error('InstallError', error)
                         defer.resolve false
                     else
 
@@ -35,7 +35,7 @@ VPN::connectPPTP = ->
 
             child = exec rasdial + " vpnht " + authString, (error, stdout, stderr) ->
                 if error
-                    Debug.error('ConnectError', err)
+                    Debug.error('ConnectError', error)
                     defer.resolve false
                 else
                     # if not connected after 10sec we send timeout
@@ -63,7 +63,7 @@ VPN::disconnectPPTP = ->
             rasdial = path.join(process.env.SystemDrive, 'Windows', 'System32', 'rasdial.exe')
             child = exec rasdial + " /disconnect", (error, stdout, stderr) ->
                 if error
-                    Debug.error('DisconnectError', err)
+                    Debug.error('DisconnectError', error)
                     defer.resolve false
                 else
 

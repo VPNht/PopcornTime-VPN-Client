@@ -87,30 +87,18 @@ VPN::disconnect = () ->
 	clearTimeout window.timerMonitorConsole if window.timerMonitorConsole
 	clearTimeout window.timerMonitor if window.timerMonitor
 
-	if @running and @protocol == 'pptp'
-		Debug.info('Client', 'Disconnecting PPTP')
-		return self.disconnectPPTP().then () ->
-			disconnectUser()
-
-	else if @running and @protocol == 'openvpn'
-		Debug.info('Client', 'Disconnecting OpenVPN')
-		return self.disconnectOpenVPN().then () ->
-			disconnectUser()
-
-	else
-		# we try all !
-		canConnectOpenVPN()
-            .then (err) ->
-				if err != false
-					Debug.info('Client', 'Disconnecting OpenVPN')
-					self.disconnectOpenVPN().then () ->
-						disconnectUser()
-				else
-					Debug.info('Client', 'Disconnecting PPTP')
-					self.disconnectPPTP().then () ->
-						disconnectUser()
-
-			.catch (err) ->
+	canConnectOpenVPN()
+		.then (err) ->
+			if err != false
+				Debug.info('Client', 'Disconnecting OpenVPN')
+				self.disconnectOpenVPN().then () ->
+					disconnectUser()
+			else
 				Debug.info('Client', 'Disconnecting PPTP')
 				self.disconnectPPTP().then () ->
 					disconnectUser()
+
+		.catch (err) ->
+			Debug.info('Client', 'Disconnecting PPTP (fallback)')
+			self.disconnectPPTP().then () ->
+				disconnectUser()
