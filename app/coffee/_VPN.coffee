@@ -82,6 +82,7 @@ VPN::disconnect = () ->
 
 	self = this
 	window.pendingCallback = false
+	window.connectionTimeout = false
 	clearTimeout window.timerMonitorConsole if window.timerMonitorConsole
 	clearTimeout window.timerMonitor if window.timerMonitor
 
