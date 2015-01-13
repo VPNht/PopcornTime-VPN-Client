@@ -101,7 +101,7 @@ VPN::disconnect = () ->
 		# we try all !
 		canConnectOpenVPN()
             .then (err) ->
-				if !err
+				if err != false
 					Debug.info('Client', 'Disconnecting OpenVPN')
 					self.disconnectOpenVPN().then () ->
 						disconnectUser()
