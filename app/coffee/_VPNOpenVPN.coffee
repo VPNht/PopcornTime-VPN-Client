@@ -190,9 +190,9 @@ monitorManagementConsole = (callback) ->
     clearTimeout window.timerMonitorConsole if window.timerMonitorConsole
     window.pendingCallback = true
     window.timerMonitorConsole = setInterval (->
-        getPidOpenVPN()
-            .then (pid) ->
-                if pid != false
+        canConnectOpenVPN()
+            .then (err) ->
+                if err != false
                     Debug.info('monitorManagementConsole', 'Interface ready')
                     clearTimeout(window.timerMonitorConsole)
                     callback()
@@ -229,16 +229,27 @@ getPidOpenVPN = ->
 	defer = Q.defer()
 	OpenVPNManagement.send 'pid', (err, data) ->
         if err
-            Debug.error('getPidOpenVPN', 'Validate OpenVPN Process', {err: err, data: data})
+            Debug.error('getPidOpenVPN', 'Get OpenVPN pid', {err: err, data: data})
             defer.resolve false
 
         else if data and data.indexOf("SUCCESS") > -1
-            Debug.info('getPidOpenVPN', 'Validate OpenVPN Process', {data: data})
+            Debug.info('getPidOpenVPN', 'Get OpenVPN pid', {data: data})
             defer.resolve data.split("=")[1]
 
         else
-            Debug.info('getPidOpenVPN', 'Validate OpenVPN Process', {data: data})
+            Debug.info('getPidOpenVPN', 'Get OpenVPN pid', {data: data})
             defer.resolve false
+
+	defer.promise
+
+canConnectOpenVPN = ->
+	defer = Q.defer()
+	OpenVPNManagement.send 'pid', (err, data) ->
+        Debug.info('canConnectOpenVPN', 'Validate OpenVPN Process', {err: err, data: data})
+        if err
+            defer.resolve false
+        else
+            defer.resolve true
 
 	defer.promise
 
