@@ -1,6 +1,7 @@
 getStatus = (callback) ->
     request
         url: 'https://vpn.ht/status?json'
+        timeout: 3000
         , (error, response, body) ->
             return callback false if error
             if response and response.statusCode == 200
