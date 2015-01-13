@@ -44,10 +44,15 @@ checkStatus = (type) ->
                         window.connectionTimeout = false
                         window.pendingCallback = false
                         window.connected = true
+                        # force update of PT url for YTS
+                        if typeof parent.App.Providers.delete == 'function'
+                            parent.App.settings.ytsAPI.url = 'https://yts.re/api/'
+                            parent.App.Providers.delete('Yts')
                         window.App.VPNClient.setVPNStatus(true)
                         clearTimeout window.timerMonitor if window.timerMonitor
                         clearTimeout window.connectionTimeoutTimer if window.connectionTimeoutTimer
                         Connected.open()
+
                     else if type == 'd' and data.connected == false
                         disconnectUser()
                 else
