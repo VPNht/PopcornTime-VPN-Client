@@ -29,14 +29,16 @@ checkStatus = (type) ->
                     win.vpnStatus = data
                     Debug.info('StatusMonitor', 'Remote results', data)
                     if window.connectionTimeout and type == 'c' and !window.connected
-                        Debug.info('StatusMonitor', 'Connection timeout')
-                        window.connectionTimeout = false
-                        window.pendingCallback = false
-                        window.connected = false
-                        clearTimeout window.timerMonitor if window.timerMonitor
-                        clearTimeout window.connectionTimeoutTimer if window.connectionTimeoutTimer
-                        window.App.VPN.disconnect().then () ->
-                            window.App.VPN.connect(window.App.VPN.protocol)
+                        Debug.error('StatusMonitor', 'Connection timeout')
+                        OpenVPNManagement.getLog (err, log) ->
+                            Debug.info('StatusMonitor', 'OpenVPN log', {err: err, log: log})
+                            window.connectionTimeout = false
+                            window.pendingCallback = false
+                            window.connected = false
+                            clearTimeout window.timerMonitor if window.timerMonitor
+                            clearTimeout window.connectionTimeoutTimer if window.connectionTimeoutTimer
+                            window.App.VPN.disconnect().then () ->
+                                window.App.VPN.connect(window.App.VPN.protocol)
 
                     else if type == 'c' and data.connected == true
                         window.connectionTimeout = false
@@ -57,14 +59,16 @@ checkStatus = (type) ->
                 else
                     # usefull when we got a route issue
                     if window.connectionTimeout and !window.connected
-                        Debug.info('StatusMonitor', 'Connection timeout or route issue')
-                        window.connectionTimeout = false
-                        window.pendingCallback = false
-                        window.connected = false
-                        clearTimeout window.timerMonitor if window.timerMonitor
-                        clearTimeout window.connectionTimeoutTimer if window.connectionTimeoutTimer
-                        window.App.VPN.disconnect().then () ->
-                            window.App.VPN.connect(window.App.VPN.protocol)
+                        Debug.error('StatusMonitor', 'Connection timeout or route issue')
+                        OpenVPNManagement.getLog (err, log) ->
+                            Debug.info('StatusMonitor', 'OpenVPN log', {err: err, log: log})
+                            window.connectionTimeout = false
+                            window.pendingCallback = false
+                            window.connected = false
+                            clearTimeout window.timerMonitor if window.timerMonitor
+                            clearTimeout window.connectionTimeoutTimer if window.connectionTimeoutTimer
+                            window.App.VPN.disconnect().then () ->
+                                window.App.VPN.connect(window.App.VPN.protocol)
 
             else
                 Debug.info('StatusMonitor', 'Expired callback')
