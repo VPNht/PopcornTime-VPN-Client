@@ -224,12 +224,14 @@ haveBinariesOpenVPN = ->
 	switch process.platform
 		when "darwin", "linux"
             bin = path.resolve(getInstallPathOpenVPN(), "openvpn")
-            Debug.info('haveBinariesOpenVPN', 'Checking OpenVPN binaries', {bin: bin})
-            return fs.existsSync(bin)
+            exist = fs.existsSync(bin)
+            Debug.info('haveBinariesOpenVPN', 'Checking OpenVPN binaries', {bin: bin, exist: exist})
+            return exist
 		when "win32"
             bin = path.resolve(getInstallPathOpenVPN(), "openvpn.exe")
-            Debug.info('haveBinariesOpenVPN', 'Checking OpenVPN binaries', {bin: bin})
-            return fs.existsSync(bin)
+            exist = fs.existsSync(bin)
+            Debug.info('haveBinariesOpenVPN', 'Checking OpenVPN binaries', {bin: bin, exist: exist})
+            return exist
 		else
 			return false
 
@@ -237,10 +239,21 @@ haveBinariesTAP = ->
 	switch process.platform
 		when "win32"
             bin = path.resolve(process.env.ProgramW6432 || process.env.ProgramFiles, "TAP-Windows", "bin", "devcon.exe")
-            Debug.info('haveBinariesTAP', 'Checking TAP binaries', {bin: bin})
-            return fs.existsSync(bin)
+            exist = fs.existsSync(bin)
+            Debug.info('haveBinariesTAP', 'Checking TAP binaries', {bin: bin, exist: exist})
+            return exist
 		else
 			return false
+
+haveScriptsOpenVPN = ->
+	switch process.platform
+		when "darwin"
+            script = path.resolve(getInstallPathOpenVPN(), "script.up")
+            exist = fs.existsSync(script)
+            Debug.info('haveScripts', 'Checking OpenVPN scripts', {script: script, exist:exist})
+            return exist
+		else
+			return true
 
 # get pid of openvpn
 # used in linux and mac
@@ -276,5 +289,4 @@ canConnectOpenVPN = ->
 getInstallPathOpenVPN = (type) ->
     type = type || false
     binpath = path.join(process.cwd(), ".openvpnht")
-    Debug.info('getInstallPathOpenVPN', 'Get OpenVPN path', {path: binpath})
     return binpath
