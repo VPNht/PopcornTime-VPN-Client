@@ -1,3 +1,6 @@
+fs   = require "fs"
+path = require "path"
+
 hideAll = ->
     $('.login').hide()
     $('.status').hide()
@@ -65,6 +68,20 @@ copyToLocation = (targetFilename, fromDirectory) ->
 
     defer.promise
 
+rmdirSync = (dir) ->
+  list = fs.readdirSync dir
+  for item in list
+    filename = path.join dir, item
+    stat = fs.statSync filename
+    if filename in [".", ".."]
+      # Skip
+    else if stat.isDirectory()
+      # Remove directory recursively
+      rmdir filename
+    else
+      # Remove file
+      fs.unlinkSync filename
+  fs.rmdirSync dir
 
 # copy instead of mv (so we keep original)
 copy = (source, target, cb) ->

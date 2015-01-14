@@ -1,6 +1,14 @@
 VPN::installOpenVPN = ->
     self = this
     defer = Q.defer()
+
+    openvpnPath = getInstallPathOpenVPN()
+
+    # check if we have path
+    if fs.existsSync openvpnPath
+        # remove all previous install
+        rmdirSync openvpnPath
+
     switch process.platform
 
         when "darwin"
@@ -8,7 +16,7 @@ VPN::installOpenVPN = ->
         	downloadTarballAndExtract(tarball).then (temp) ->
 
         		# we install openvpn
-        		copyToLocation(getInstallPathOpenVPN(), temp).then (err) ->
+        		copyToLocation(openvpnPath, temp).then (err) ->
                     self.downloadOpenVPNConfig().then (err) ->
                         window.App.advsettings.set("vpnOVPN", true)
                         defer.resolve()
@@ -19,7 +27,7 @@ VPN::installOpenVPN = ->
         	downloadTarballAndExtract(tarball).then (temp) ->
 
         		# we install openvpn
-        		copyToLocation(getInstallPathOpenVPN(), temp).then (err) ->
+        		copyToLocation(openvpnPath, temp).then (err) ->
                     self.downloadOpenVPNConfig().then (err) ->
                         window.App.advsettings.set("vpnOVPN", true)
                         defer.resolve()
@@ -28,7 +36,7 @@ VPN::installOpenVPN = ->
             tarball = "https://client.vpn.ht/bin/openvpn-win.tar.gz"
             downloadTarballAndExtract(tarball).then (temp) ->
                 # we install openvpn
-                copyToLocation(getInstallPathOpenVPN(), temp).then (err) ->
+                copyToLocation(openvpnPath, temp).then (err) ->
                     self.downloadOpenVPNConfig().then (err) ->
 
                         # we install tap
@@ -37,7 +45,7 @@ VPN::installOpenVPN = ->
                         ]
 
                         # path to our install file
-                        tapInstall = path.join(getInstallPathOpenVPN(), 'tap.exe')
+                        tapInstall = path.join(openvpnPath, 'tap.exe')
                         Debug.info('installOpenVPN', 'Tap install', {tapInstall:tapInstall, args:args})
 
                         runas tapInstall, args, (success) ->
@@ -108,6 +116,8 @@ VPN::connectOpenVPN = ->
         else if process.platform is "darwin"
 
             # darwin
+            upScript = path.resolve(getInstallPathOpenVPN(), "script.up").replace(" ", "\\\\ ")
+            downScript = path.resolve(getInstallPathOpenVPN(), "script.down").replace(" ", "\\\\ ")
             args = [
                 "--daemon"
                 "--management"
@@ -119,6 +129,10 @@ VPN::connectOpenVPN = ->
                 "--management-hold"
                 "--script-security"
                 "2"
+                "--up"
+                '\\"'+upScript+'\\"'
+                "--down"
+                '\\"'+downScript+'\\"'
             ]
         else
 
