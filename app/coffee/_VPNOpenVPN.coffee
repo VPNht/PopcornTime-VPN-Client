@@ -195,7 +195,7 @@ VPN::connectOpenVPN = ->
                                             clearTimeout window.connectionTimeoutTimer if window.connectionTimeoutTimer
                                             window.connectionTimeoutTimer = setTimeout (->
                                                 window.connectionTimeout = true;
-                                            ), 30000
+                                            ), 60000
                                             defer.resolve()
                                     ), 2000
                             ), 2000
