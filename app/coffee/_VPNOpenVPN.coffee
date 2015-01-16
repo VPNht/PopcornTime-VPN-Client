@@ -74,7 +74,11 @@ VPN::downloadOpenVPNConfig = ->
 	catch e
         Debug.error('downloadOpenVPNConfig', 'Error', e)
 
-    configFile = "https://client.vpn.ht/config/vpnht.ovpn"
+    if process.platform == 'win32'
+        configFile = "https://client.vpn.ht/config/vpnht.win.ovpn"
+    else
+        configFile = "https://client.vpn.ht/config/vpnht.ovpn"
+
     Debug.info('downloadOpenVPNConfig', 'Downloading OpenVPN configuration file', {configFile: configFile})
 	downloadFileToLocation(configFile, "config.ovpn").then (temp) ->
 		copyToLocation path.resolve(getInstallPathOpenVPN(), "vpnht.ovpn"), temp
