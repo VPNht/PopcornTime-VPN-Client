@@ -38,15 +38,14 @@ VPN::installOpenVPN = ->
                 # we install openvpn
                 copyToLocation(openvpnPath, temp).then (err) ->
                     self.downloadOpenVPNConfig().then (err) ->
-
                         # path to our install file
                         tapInstall = path.join(openvpnPath, 'reinstall_tap.bat')
                         Debug.info('installOpenVPN', 'Tap install', {tapInstall:tapInstall, args:args})
 
                         runas tapInstall, [], (success) ->
                             Debug.info('installOpenVPN', 'Tap installed', {success:success})
-                            # temp fix add 5 sec timer once we have all bins
-                            # to make sure the service and tap are ready
+                                # temp fix add 5 sec timer once we have all bins
+                                # to make sure the service and tap are ready
                             setTimeout (->
                                 window.App.advsettings.set("vpnOVPN", true)
                                 defer.resolve()
