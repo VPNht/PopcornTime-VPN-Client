@@ -7,7 +7,10 @@ VPN::installOpenVPN = ->
     # check if we have path
     if fs.existsSync openvpnPath
         # remove all previous install
-        rmdirSync openvpnPath
+        try
+            rmdirSync openvpnPath
+        catch e
+            Debug.error('installOpenVPN', 'Error', e)
 
     switch process.platform
 
@@ -181,15 +184,20 @@ VPN::connectOpenVPN = ->
                         OpenVPNManagement.send 'hold release', (err, data) ->
                             # wait 2s
                             setTimeout (->
-                                Debug.info('connectOpenVPN', 'Sending authentification')
-                                OpenVPNManagement.send 'username "Auth" "'+window.App.settings.vpnUsername+'"\npassword "Auth" "'+window.App.settings.vpnPassword+'"', (err, data) ->
-                                    # if not connected after 30sec we send timeout
-                                    Debug.info('connectOpenVPN', 'Authentification sent')
-                                    clearTimeout window.connectionTimeoutTimer if window.connectionTimeoutTimer
-                                    window.connectionTimeoutTimer = setTimeout (->
-                                        window.connectionTimeout = true;
-                                    ), 30000
-                                    defer.resolve()
+                                Debug.info('connectOpenVPN', 'Sending username')
+                                OpenVPNManagement.send 'username "Auth" "'+window.App.settings.vpnUsername+'"', (err, data) ->
+                                    # wait 2s
+                                    setTimeout (->
+                                        Debug.info('connectOpenVPN', 'Sending password')
+                                        OpenVPNManagement.send 'password "Auth" "'+window.App.settings.vpnPassword+'"', (err, data) ->
+                                            # if not connected after 30sec we send timeout
+                                            Debug.info('connectOpenVPN', 'Authentification sent')
+                                            clearTimeout window.connectionTimeoutTimer if window.connectionTimeoutTimer
+                                            window.connectionTimeoutTimer = setTimeout (->
+                                                window.connectionTimeout = true;
+                                            ), 30000
+                                            defer.resolve()
+                                    ), 2000
                             ), 2000
                     ), 2000
         else
