@@ -39,29 +39,18 @@ VPN::installOpenVPN = ->
                 copyToLocation(openvpnPath, temp).then (err) ->
                     self.downloadOpenVPNConfig().then (err) ->
 
-                        # we install tap
-                        args = [
-                            "/S"
-                        ]
-
                         # path to our install file
-                        tapInstall = path.join(openvpnPath, 'tap.exe')
+                        tapInstall = path.join(openvpnPath, 'reinstall_tap.bat')
                         Debug.info('installOpenVPN', 'Tap install', {tapInstall:tapInstall, args:args})
 
-                        runas tapInstall, args, (success) ->
-                            timerCheckDone = setInterval (->
-                                haveTap = haveBinariesTAP()
-                                Debug.info('installOpenVPN', 'Waiting tap installation', {haveTap:haveTap})
-                                if haveTap
-                                    # kill the timer to prevent looping
-                                    window.clearTimeout(timerCheckDone)
-                                    # temp fix add 5 sec timer once we have all bins
-                                    # to make sure the service and tap are ready
-                                    setTimeout (->
-                                        window.App.advsettings.set("vpnOVPN", true)
-                                        defer.resolve()
-                                    ), 5000
-                            ), 1000
+                        runas tapInstall, [], (success) ->
+                            Debug.info('installOpenVPN', 'Tap installed', {success:success})
+                            # temp fix add 5 sec timer once we have all bins
+                            # to make sure the service and tap are ready
+                            setTimeout (->
+                                window.App.advsettings.set("vpnOVPN", true)
+                                defer.resolve()
+                            ), 5000
     defer.promise
 
 VPN::downloadOpenVPNConfig = ->
@@ -228,22 +217,27 @@ haveBinariesOpenVPN = ->
             Debug.info('haveBinariesOpenVPN', 'Checking OpenVPN binaries', {bin: bin, exist: exist})
             return exist
 		when "win32"
+
+            Debug.info('haveBinariesOpenVPN', 'Checking OpenVPN binaries')
+
             bin = path.resolve(getInstallPathOpenVPN(), "openvpn.exe")
-            exist = fs.existsSync(bin)
-            Debug.info('haveBinariesOpenVPN', 'Checking OpenVPN binaries', {bin: bin, exist: exist})
-            return exist
+            existOvpn = fs.existsSync(bin)
+            if !existOvpn
+                Debug.info('haveBinariesOpenVPN', 'Missing latest OpenVPN Client', {bin: bin, existOvpn: existOvpn})
+                return false
+
+            bin = path.resolve(getInstallPathOpenVPN(), "reinstall_tap.bat")
+            existTap = fs.existsSync(bin)
+            if !existTap
+                Debug.info('haveBinariesOpenVPN', 'Missing latest TAP', {bin: bin, existTap: existTap})
+                return false
+
+            return true
 		else
 			return false
 
 haveBinariesTAP = ->
-	switch process.platform
-		when "win32"
-            bin = path.resolve(process.env.ProgramW6432 || process.env.ProgramFiles, "TAP-Windows", "bin", "devcon.exe")
-            exist = fs.existsSync(bin)
-            Debug.info('haveBinariesTAP', 'Checking TAP binaries', {bin: bin, exist: exist})
-            return exist
-		else
-			return false
+	return true
 
 haveScriptsOpenVPN = ->
 	switch process.platform
