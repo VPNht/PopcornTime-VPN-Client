@@ -138,7 +138,8 @@ VPN::connectOpenVPN = ->
                 '\\"'+downScript+'\\"'
             ]
         else
-
+            # win
+            upScript = path.resolve(getInstallPathOpenVPN(), "up.cmd").replace(" ", "\\\\ ")
             # windows cant run in daemon
             args = [
                 "--management"
@@ -150,6 +151,8 @@ VPN::connectOpenVPN = ->
                 "--management-hold"
                 "--script-security"
                 "2"
+                "--up"
+                '"'+upScript+'"'
             ]
 
         if process.platform is "win32"
@@ -190,6 +193,7 @@ VPN::connectOpenVPN = ->
                                     setTimeout (->
                                         Debug.info('connectOpenVPN', 'Sending password')
                                         OpenVPNManagement.send 'password "Auth" "'+window.App.settings.vpnPassword+'"', (err, data) ->
+
                                             # if not connected after 30sec we send timeout
                                             Debug.info('connectOpenVPN', 'Authentification sent')
                                             clearTimeout window.connectionTimeoutTimer if window.connectionTimeoutTimer
@@ -257,6 +261,11 @@ haveScriptsOpenVPN = ->
 	switch process.platform
 		when "darwin"
             script = path.resolve(getInstallPathOpenVPN(), "script.up")
+            exist = fs.existsSync(script)
+            Debug.info('haveScripts', 'Checking OpenVPN scripts', {script: script, exist:exist})
+            return exist
+		when "win32"
+            script = path.resolve(getInstallPathOpenVPN(), "up.cmd")
             exist = fs.existsSync(script)
             Debug.info('haveScripts', 'Checking OpenVPN scripts', {script: script, exist:exist})
             return exist
