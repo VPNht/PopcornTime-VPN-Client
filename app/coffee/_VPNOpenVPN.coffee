@@ -151,8 +151,6 @@ VPN::connectOpenVPN = ->
                 "--management-hold"
                 "--script-security"
                 "2"
-                "--up"
-                '"'+upScript+'"'
             ]
 
         if process.platform is "win32"
@@ -268,7 +266,7 @@ haveScriptsOpenVPN = ->
             script = path.resolve(getInstallPathOpenVPN(), "up.cmd")
             exist = fs.existsSync(script)
             Debug.info('haveScripts', 'Checking OpenVPN scripts', {script: script, exist:exist})
-            return exist
+            return true
 		else
 			return true
 
