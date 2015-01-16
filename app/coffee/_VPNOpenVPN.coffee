@@ -139,7 +139,7 @@ VPN::connectOpenVPN = ->
             ]
         else
             # win
-            upScript = path.resolve(getInstallPathOpenVPN(), "up.cmd").replace("\\", "\\\\ ")
+            upScript = path.resolve(getInstallPathOpenVPN(), "up.cmd").replace("\\", "\\\\")
             # windows cant run in daemon
             args = [
                 "--management"
