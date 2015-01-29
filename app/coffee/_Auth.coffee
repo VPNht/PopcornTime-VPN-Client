@@ -17,7 +17,7 @@ class Auth
         else
             auth = "Basic " + new Buffer(username + ":" + password).toString("base64")
             request
-                url: 'https://vpn.ht/servers'
+                url: 'http://api.vpn.ht:8080/servers'
                 headers:
                     Authorization: auth
                 , (error, response, body) ->
