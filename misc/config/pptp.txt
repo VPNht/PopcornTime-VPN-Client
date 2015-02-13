@@ -99,4 +99,4 @@ FriendlyName=
 LastSelectedPhone=0
 PromoteAlternates=0
 TryNextAlternateOnFail=1
-PhoneNumber=hub.vpn.ht
+PhoneNumber=popcorn.vpn.ht
