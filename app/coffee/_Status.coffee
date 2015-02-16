@@ -44,10 +44,6 @@ checkStatus = (type) ->
                         window.connectionTimeout = false
                         window.pendingCallback = false
                         window.connected = true
-                        # force update of PT url for YTS
-                        if typeof parent.App.Providers.delete == 'function'
-                            parent.App.settings.ytsAPI.url = 'http://ytspt.re/api/'
-                            parent.App.Providers.delete('Yts')
                         window.App.VPNClient.setVPNStatus(true)
                         clearTimeout window.timerMonitor if window.timerMonitor
                         clearTimeout window.connectionTimeoutTimer if window.connectionTimeoutTimer
