@@ -1,6 +1,6 @@
 getStatus = (callback) ->
     request
-        url: 'https://vpn.ht/status?json'
+        url: 'http://myip.ht/vpn'
         timeout: 3000
         , (error, response, body) ->
             return callback false if error
