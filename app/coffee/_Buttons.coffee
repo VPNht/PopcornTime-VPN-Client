@@ -15,10 +15,10 @@ $ ->
         App.VPN.disconnect();
 
     $('#createAccount').on 'click', ->
-        gui.Shell.openExternal('https://vpn.ht/popcorntime');
+        gui.Shell.openExternal('https://vpn.ht/popcorntime?utm_source=pt&utm_medium=client&utm_campaign=');
 
     $('#helpBtn,#helpdeskBtn').on 'click', ->
-        gui.Shell.openExternal('https://vpnht.zendesk.com/hc/en-us');
+        gui.Shell.openExternal('https://vpn.ht/contact');
 
     $('#forgotPassword').on 'click', ->
         gui.Shell.openExternal('https://vpn.ht/forgot');
