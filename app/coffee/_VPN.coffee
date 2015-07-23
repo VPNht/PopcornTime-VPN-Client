@@ -102,3 +102,30 @@ VPN::disconnect = () ->
 			Debug.info('Client', 'Disconnecting PPTP (fallback)')
 			self.disconnectPPTP().then () ->
 				disconnectUser()
+
+VPN::disconnectAsync = (callback) ->
+	hideAll()
+	$('.loading').show()
+
+	self = this
+	window.pendingCallback = false
+	window.connectionTimeout = false
+	clearTimeout window.connectionTimeoutTimer if window.connectionTimeoutTimer
+	clearTimeout window.timerMonitorConsole if window.timerMonitorConsole
+	clearTimeout window.timerMonitor if window.timerMonitor
+
+	canConnectOpenVPN()
+		.then (err) ->
+			if err != false
+				Debug.info('Client', 'Disconnecting OpenVPN')
+				self.disconnectOpenVPN().then () ->
+					callback()
+			else
+				Debug.info('Client', 'Disconnecting PPTP')
+				self.disconnectPPTP().then () ->
+					callback()
+
+		.catch (err) ->
+			Debug.info('Client', 'Disconnecting PPTP (fallback)')
+			self.disconnectPPTP().then () ->
+				callback()
