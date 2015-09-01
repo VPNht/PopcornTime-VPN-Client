@@ -1,5 +1,15 @@
 @charset "UTF-8";
 
+/* Logo */
+#logo {
+    background-image: url(https://vpn.ht/themes/vpnht/assets/www2/images/logo.png);
+    background-size: 159px 62px;
+    background-repeat: no-repeat;
+    margin: 35px auto 0 auto;
+    width: 159px;
+    height: 62px;
+}
+
 /*Title Bar*/
 header{
     width:         100%;
