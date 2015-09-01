@@ -1,5 +1,15 @@
 @charset "UTF-8";
 
+/* Logo */
+#logo {
+    background-image: url(https://vpn.ht/themes/vpnht/assets/www2/images/logo.png);
+    background-size: 159px 62px;
+    background-repeat: no-repeat;
+    margin: 35px auto 0 auto;
+    width: 159px;
+    height: 62px;
+}
+
 /*Title Bar*/
 header{
     width:         100%;
@@ -146,7 +156,9 @@ uiload {
   background: none;
   position: relative;
   width: 200px;
-  height: 200px; }
+  height: 200px;
+  margin: 0 auto;
+}
 
 .uil-facebook-css > div {
   position: absolute;
@@ -154,7 +166,7 @@ uiload {
   height: 120px;
   top: 40px;
   left: 20px;
-  background: #2d72d9;
+  background: #00a6a3;
   opacity: 0.6;
   -ms-animation: uil-facebook 1s cubic-bezier(0.01, 0.73, 0.28, 0.93) infinite;
   -moz-animation: uil-facebook 1s cubic-bezier(0.01, 0.73, 0.28, 0.93) infinite;

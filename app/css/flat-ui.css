@@ -697,7 +697,7 @@ a.thumbnail.active {
   font-weight: normal;
   line-height: 1.4;
   border: none;
-  border-radius: 4px;
+  border-radius: 0px;
   -webkit-transition: border .25s linear, color .25s linear, background-color .25s linear;
           transition: border .25s linear, color .25s linear, background-color .25s linear;
 
@@ -1019,8 +1019,8 @@ fieldset[disabled] .btn-warning.active {
 .btn-inverse.active,
 .open > .dropdown-toggle.btn-inverse {
   color: #fff;
-  background-color: #415b76;
-  border-color: #415b76;
+  background-color: #00a6a3;
+  border-color: #00a6a3;
   }
 .btn-inverse:active,
 .btn-inverse.active,
@@ -2906,7 +2906,7 @@ fieldset[disabled] .input-group-btn .btn-default.active {
 .pagination-inverse ul li > span:hover,
 .pagination-inverse ul li > a:focus,
 .pagination-inverse ul li > span:focus {
-  background-color: #415b76;
+  background-color: #00a6a3;
   }
 .pagination-inverse ul li > a:active,
 .pagination-inverse ul li > span:active {
@@ -3539,8 +3539,8 @@ fieldset[disabled] .input-group-btn .btn-default.active {
 .select-inverse .select2-choice:focus,
 .select-inverse .select2-choice:active {
   color: #fff;
-  background-color: #415b76;
-  border-color: #415b76;
+  background-color: #00a6a3;
+  border-color: #00a6a3;
   }
 .select-inverse .select2-choice:active {
   background: #2c3e50;
@@ -3772,7 +3772,7 @@ fieldset[disabled] .input-group-btn .btn-default.active {
   background-color: #34495e;
   }
 .select2-container-multi.multiselect-inverse .select2-search-choice:hover {
-  background-color: #415b76;
+  background-color: #00a6a3;
   }
 .select2-drop {
   position: absolute;
