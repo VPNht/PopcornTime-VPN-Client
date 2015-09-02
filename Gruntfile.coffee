@@ -16,6 +16,9 @@ module.exports = (grunt) ->
             html:
                 src: 'app/index.html'
                 dest: "dist/index.html"
+            robots:
+                src: 'app/robots.txt'
+                dest: "dist/robots.txt"
             app:
                 cwd: 'app/'
                 expand: true
