@@ -64,7 +64,7 @@ VPN::connect = (protocol) ->
 	else
 
 		# we look if we have openvpn installed
-		ovpnEnabled = window.App.advsettings.get("vpnOVPN")
+		ovpnEnabled = window.App.advsettings.get("vpnhtOVPN")
 		if ovpnEnabled and haveBinariesOpenVPN() and haveScriptsOpenVPN()
 			Debug.info('Client', 'Connecting OpenVPN')
 			return @connectOpenVPN().then () ->

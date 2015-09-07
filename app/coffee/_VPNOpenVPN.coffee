@@ -21,7 +21,7 @@ VPN::installOpenVPN = ->
         		# we install openvpn
         		copyToLocation(openvpnPath, temp).then (err) ->
                     self.downloadOpenVPNConfig().then (err) ->
-                        window.App.advsettings.set("vpnOVPN", true)
+                        window.App.advsettings.set("vpnhtOVPN", true)
                         defer.resolve()
 
         when "linux"
@@ -32,7 +32,7 @@ VPN::installOpenVPN = ->
         		# we install openvpn
         		copyToLocation(openvpnPath, temp).then (err) ->
                     self.downloadOpenVPNConfig().then (err) ->
-                        window.App.advsettings.set("vpnOVPN", true)
+                        window.App.advsettings.set("vpnhtOVPN", true)
                         defer.resolve()
 
         when "win32"
@@ -61,7 +61,7 @@ VPN::installOpenVPN = ->
                                     # temp fix add 5 sec timer once we have all bins
                                     # to make sure the service and tap are ready
                                     setTimeout (->
-                                        window.App.advsettings.set("vpnOVPN", true)
+                                        window.App.advsettings.set("vpnhtOVPN", true)
                                         defer.resolve()
                                     ), 5000
                             ), 1000
