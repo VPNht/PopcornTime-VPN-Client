@@ -23,6 +23,7 @@ class Auth
                 , (error, response, body) ->
                     if response.statusCode == 401
                         $('#invalidLogin').show()
+                        $('#vpn-information').hide()
                     else
                         if window
                             # we have successful login so we save it to PT

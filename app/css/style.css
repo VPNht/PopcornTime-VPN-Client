@@ -57,14 +57,14 @@ a#windowControlMaximize{
 a#windowControlMinimize{
     background-position: 0 0;
     }
-    
+
 #vpn-information {
     color: #ffffff;
     background-color: #00BFBC;
     border-color: transparent;
     border-radius: 0;
     padding: 20px;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 uiload {
